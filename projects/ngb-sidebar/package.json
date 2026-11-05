@@ -1,6 +1,6 @@
 {
   "name": "@amro93/ngb-sidebar",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Composable Angular navigation sidebar (icon/offcanvas collapse, variants, nested menus) and overlay drawer, built with Bootstrap 5 classes",
   "keywords": [
     "angular",
