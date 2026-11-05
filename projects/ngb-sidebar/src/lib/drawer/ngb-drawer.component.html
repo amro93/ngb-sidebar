@@ -1,9 +1,9 @@
 @if (rendered()) {
-  <div #root class="ngb-sidebar-root">
+  <div #root class="ngb-drawer-root">
     @if (modal()) {
       <div
-        class="ngb-sidebar-mask"
-        [class.ngb-sidebar-mask-active]="active()"
+        class="ngb-drawer-mask"
+        [class.ngb-drawer-mask-active]="active()"
         [ngClass]="maskStyleClass()"
         [style.z-index]="maskZIndex()"
         [style.transition-duration.ms]="transitionDuration()"
@@ -12,7 +12,7 @@
     }
     <div
       #container
-      class="ngb-sidebar"
+      class="ngb-drawer"
       [id]="id"
       [ngClass]="panelClasses()"
       [ngStyle]="panelStyle()"
@@ -26,8 +26,8 @@
       @if (headlessTpl(); as headless) {
         <ng-container *ngTemplateOutlet="headless.templateRef; context: tplContext"></ng-container>
       } @else {
-        <div class="ngb-sidebar-header">
-          <div class="ngb-sidebar-title" [id]="headerId">
+        <div class="ngb-drawer-header">
+          <div class="ngb-drawer-title" [id]="headerId">
             @if (headerTpl(); as h) {
               <ng-container *ngTemplateOutlet="h.templateRef; context: tplContext"></ng-container>
             } @else if (header()) {
@@ -37,12 +37,14 @@
           @if (showCloseIcon() && closable()) {
             <button
               type="button"
-              class="ngb-sidebar-close"
+              class="ngb-drawer-close"
               [attr.aria-label]="ariaCloseLabel()"
               (click)="close('close-button')"
             >
               @if (closeIconTpl(); as ci) {
-                <ng-container *ngTemplateOutlet="ci.templateRef; context: tplContext"></ng-container>
+                <ng-container
+                  *ngTemplateOutlet="ci.templateRef; context: tplContext"
+                ></ng-container>
               } @else if (closeIcon()) {
                 <i [class]="closeIcon()" aria-hidden="true"></i>
               } @else {
@@ -51,14 +53,14 @@
             </button>
           }
         </div>
-        <div class="ngb-sidebar-content">
+        <div class="ngb-drawer-content">
           <ng-content></ng-content>
           @if (contentTpl(); as c) {
             <ng-container *ngTemplateOutlet="c.templateRef; context: tplContext"></ng-container>
           }
         </div>
         @if (footerTpl(); as f) {
-          <div class="ngb-sidebar-footer">
+          <div class="ngb-drawer-footer">
             <ng-container *ngTemplateOutlet="f.templateRef; context: tplContext"></ng-container>
           </div>
         }

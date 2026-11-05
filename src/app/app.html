@@ -1,0 +1,147 @@
+<app-navbar [appVersion]="appVersion" [isDarkMode]="isDarkMode()" (themeToggle)="toggleTheme()" />
+
+<div class="container py-4 my-2">
+  <app-hero-section />
+
+  <div class="row g-4" id="examples">
+    <div class="col-lg-3">
+      <app-quick-nav [links]="links" />
+    </div>
+
+    <div class="col-lg-9">
+      <app-example-card
+        anchor="getting-started"
+        title="Getting Started"
+        icon="bi bi-rocket-takeoff"
+        description="Install, import NGB_SIDEBAR and compose the parts."
+        [html]="quickStart"
+        [ts]="quickStartTs"
+      >
+        <pre class="code-box mb-3"><code>{{ install }}</code></pre>
+        <p class="small mb-2">
+          Add Bootstrap (and optionally Bootstrap Icons) to your global styles, then compose:
+          <code>ngb-sidebar-layout</code> → <code>ngb-sidebar</code> (header / content / footer /
+          groups / menus) + <code>ngb-sidebar-main</code>. Use <code>ngbSidebarTrigger</code> to
+          toggle, or <code>ngb-sidebar-nav [model]</code> to render a whole menu from data.
+        </p>
+        <p class="small mb-0 text-body-secondary">Open the HTML / TS tabs for a minimal shell.</p>
+      </app-example-card>
+
+      <app-example-card
+        anchor="variants"
+        title="Variants Playground"
+        icon="bi bi-sliders"
+        description="Every variant, collapsible mode, side, overlay, open-on-hover and backdrop."
+        [html]="demos.variants.html"
+        [ts]="demos.variants.ts"
+      >
+        <app-variants-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="with-menu"
+        title="With Menu"
+        icon="bi bi-menu-button-wide"
+        description="Application chrome: workspace switcher, grouped navigation with group action, user dropdown. Collapses to icons."
+        [html]="demos.menu.html"
+        [ts]="demos.menu.ts"
+      >
+        <app-menu-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="responsive"
+        title="Responsive"
+        icon="bi bi-phone"
+        description="Below the breakpoint the sidebar becomes an off-canvas overlay with backdrop."
+        [html]="demos.responsive.html"
+        [ts]="demos.responsive.ts"
+      >
+        <app-responsive-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="dual"
+        title="Dual Sidebar"
+        icon="bi bi-layout-three-columns"
+        description="Two sidebars on opposite sides with independent triggers."
+        [html]="demos.dual.html"
+        [ts]="demos.dual.ts"
+      >
+        <app-dual-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="multi"
+        title="Multi Sidebar"
+        icon="bi bi-layout-sidebar-inset"
+        description="Hover-to-open icon bar stacked with a secondary panel with collapsible groups."
+        [html]="demos.multi.html"
+        [ts]="demos.multi.ts"
+      >
+        <app-multi-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="nested"
+        title="Nested Menu"
+        icon="bi bi-diagram-3"
+        description="Deep tree with active tracking, breadcrumb, expand/collapse all and accordion mode."
+        [html]="demos.nested.html"
+        [ts]="demos.nested.ts"
+      >
+        <app-nested-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="model"
+        title="Data-driven Menu"
+        icon="bi bi-braces"
+        description="NgbSidebarMenuItem model: groups, separators, badges, links, commands, actions, disabled/hidden items, custom template and events."
+        [html]="demos.model.html"
+        [ts]="demos.model.ts"
+      >
+        <app-model-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="chat"
+        title="Chat Application"
+        icon="bi bi-chat-dots"
+        description="Grouped history with search, new chat and hover-revealed delete action."
+        [html]="demos.chat.html"
+        [ts]="demos.chat.ts"
+      >
+        <app-chat-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="config"
+        title="Configuration & Theming"
+        icon="bi bi-palette"
+        description="Width, icon width, keyboard shortcut, persisted state, dismissable overlay and CSS-variable themes."
+        [html]="demos.config.html"
+        [ts]="demos.config.ts"
+      >
+        <app-config-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="drawer"
+        title="Drawer (overlay panel)"
+        icon="bi bi-window-sidebar"
+        description="Positions, full screen, templates, headless menu and events."
+        [html]="demos.drawer.html"
+        [ts]="demos.drawer.ts"
+      >
+        <app-drawer-demo />
+      </app-example-card>
+
+      <div id="api-reference">
+        <app-api-reference [appVersion]="appVersion" />
+      </div>
+    </div>
+  </div>
+
+  <app-footer [appVersion]="appVersion" />
+</div>

@@ -8,8 +8,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "ngb-sidebar": ["./dist/ngb-sidebar"],
-      "@amro93/ngb-sidebar": ["./dist/ngb-sidebar"]
+      "ngb-sidebar": ["./projects/ngb-sidebar/src/public-api.ts"],
+      "@amro93/ngb-sidebar": ["./projects/ngb-sidebar/src/public-api.ts"]
     },
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,

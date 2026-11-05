@@ -8,7 +8,7 @@
     "build:lib": "ng build ngb-sidebar",
     "build:demo": "ng build ngb-sidebar-app",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "ng test ngb-sidebar --watch=false",
     "test:lib": "ng test ngb-sidebar",
     "sync:version": "node ./scripts/sync-version.js",
     "version": "node ./scripts/sync-version.js",

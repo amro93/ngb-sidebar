@@ -1,16 +1,20 @@
 {
   "name": "@amro93/ngb-sidebar",
   "version": "0.1.0",
-  "description": "Lightweight, accessible, standalone Angular Sidebar (drawer) component built with pure Bootstrap 5",
+  "description": "Composable Angular navigation sidebar (icon/offcanvas collapse, variants, nested menus) and overlay drawer, built with pure Bootstrap 5",
   "keywords": [
     "angular",
     "angular-sidebar",
-    "bootstrap",
-    "bootstrap-5",
     "sidebar",
+    "navigation",
+    "nav-menu",
+    "sub-menu",
     "drawer",
     "offcanvas",
+    "bootstrap",
+    "bootstrap-5",
     "standalone",
+    "signals",
     "ngb-sidebar"
   ],
   "author": "amro93",
@@ -27,8 +31,8 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@angular/common": ">=18.0.0",
-    "@angular/core": ">=18.0.0",
+    "@angular/common": ">=20.0.0",
+    "@angular/core": ">=20.0.0",
     "bootstrap": ">=5.0.0"
   },
   "peerDependenciesMeta": {

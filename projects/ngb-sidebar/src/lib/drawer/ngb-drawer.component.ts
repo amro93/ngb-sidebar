@@ -19,19 +19,19 @@ import {
 } from '@angular/core';
 import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
 import {
-  NGB_SIDEBAR_VERSION,
-  SidebarAppendTo,
-  SidebarHideEvent,
-  SidebarPosition,
-} from './ngb-sidebar.interface';
+  NGB_DRAWER_VERSION,
+  DrawerAppendTo,
+  DrawerHideEvent,
+  DrawerPosition,
+} from './ngb-drawer.interface';
 import {
-  NgbSidebarCloseIconDirective,
-  NgbSidebarContentDirective,
-  NgbSidebarFooterDirective,
-  NgbSidebarHeadlessDirective,
-  NgbSidebarHeaderDirective,
-  SidebarTemplateContext,
-} from './ngb-sidebar.templates';
+  NgbDrawerCloseIconDirective,
+  NgbDrawerContentDirective,
+  NgbDrawerFooterDirective,
+  NgbDrawerHeadlessDirective,
+  NgbDrawerHeaderDirective,
+  DrawerTemplateContext,
+} from './ngb-drawer.templates';
 
 let nextId = 0;
 /** Shared counter so the most recently opened sidebar is always on top. */
@@ -47,19 +47,19 @@ const FOCUSABLE =
  * Bootstrap 5 styled sidebar / drawer panel that slides in from any viewport edge.
  *
  * ```html
- * <ngb-sidebar [(visible)]="open" position="right" header="Settings">...</ngb-sidebar>
+ * <ngb-drawer [(visible)]="open" position="right" header="Settings">...</ngb-drawer>
  * ```
  */
 @Component({
-  selector: 'ngb-sidebar',
+  selector: 'ngb-drawer',
   standalone: true,
   imports: [NgClass, NgStyle, NgTemplateOutlet],
-  templateUrl: './ngb-sidebar.component.html',
-  styleUrls: ['./ngb-sidebar.component.scss'],
+  templateUrl: './ngb-drawer.component.html',
+  styleUrls: ['./ngb-drawer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgbSidebarComponent implements OnDestroy {
-  public static readonly VERSION = NGB_SIDEBAR_VERSION;
+export class NgbDrawerComponent implements OnDestroy {
+  public static readonly VERSION = NGB_DRAWER_VERSION;
 
   private readonly document = inject(DOCUMENT);
   private readonly hostEl = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -69,7 +69,7 @@ export class NgbSidebarComponent implements OnDestroy {
   visible = model<boolean>(false);
 
   // --- Layout ---
-  position = input<SidebarPosition>('left');
+  position = input<DrawerPosition>('left');
   fullScreen = input(false, { transform: booleanAttribute });
   header = input<string | undefined>(undefined);
   /** Width (left/right) or height (top/bottom), e.g. `'30rem'`. */
@@ -77,7 +77,7 @@ export class NgbSidebarComponent implements OnDestroy {
   style = input<Record<string, any> | null>(null);
   styleClass = input<string>('');
   maskStyleClass = input<string>('');
-  appendTo = input<SidebarAppendTo>('body');
+  appendTo = input<DrawerAppendTo>('body');
 
   // --- Behaviour ---
   /** Render a backdrop mask behind the panel. */
@@ -108,19 +108,19 @@ export class NgbSidebarComponent implements OnDestroy {
   /** Emitted once the show animation has started and focus was moved. */
   onShow = output<void>();
   /** Emitted after the hide animation completes. */
-  onHide = output<SidebarHideEvent>();
+  onHide = output<DrawerHideEvent>();
 
   // --- Templates ---
-  readonly headerTpl = contentChild(NgbSidebarHeaderDirective);
-  readonly contentTpl = contentChild(NgbSidebarContentDirective);
-  readonly footerTpl = contentChild(NgbSidebarFooterDirective);
-  readonly headlessTpl = contentChild(NgbSidebarHeadlessDirective);
-  readonly closeIconTpl = contentChild(NgbSidebarCloseIconDirective);
+  readonly headerTpl = contentChild(NgbDrawerHeaderDirective);
+  readonly contentTpl = contentChild(NgbDrawerContentDirective);
+  readonly footerTpl = contentChild(NgbDrawerFooterDirective);
+  readonly headlessTpl = contentChild(NgbDrawerHeadlessDirective);
+  readonly closeIconTpl = contentChild(NgbDrawerCloseIconDirective);
 
   private readonly container = viewChild<ElementRef<HTMLElement>>('container');
   private readonly root = viewChild<ElementRef<HTMLElement>>('root');
 
-  readonly id = `ngb-sidebar-${nextId++}`;
+  readonly id = `ngb-drawer-${nextId++}`;
   readonly headerId = `${this.id}-header`;
 
   /** DOM is rendered (stays true during the leave animation). */
@@ -133,7 +133,7 @@ export class NgbSidebarComponent implements OnDestroy {
     return z === null ? null : z - 1;
   });
 
-  readonly effectivePosition = computed<SidebarPosition>(() =>
+  readonly effectivePosition = computed<DrawerPosition>(() =>
     this.fullScreen() ? 'full' : this.position(),
   );
 
@@ -143,8 +143,8 @@ export class NgbSidebarComponent implements OnDestroy {
 
   readonly panelClasses = computed(() => {
     const cls: Record<string, boolean> = {
-      [`ngb-sidebar-${this.effectivePosition()}`]: true,
-      'ngb-sidebar-active': this.active(),
+      [`ngb-drawer-${this.effectivePosition()}`]: true,
+      'ngb-drawer-active': this.active(),
     };
     if (this.styleClass()) cls[this.styleClass()] = true;
     return cls;
@@ -160,13 +160,13 @@ export class NgbSidebarComponent implements OnDestroy {
     return s;
   });
 
-  readonly tplContext: SidebarTemplateContext = {
+  readonly tplContext: DrawerTemplateContext = {
     $implicit: () => this.close(),
     close: () => this.close(),
   };
 
   private previouslyFocused: Element | null = null;
-  private hideReason: SidebarHideEvent['reason'] = 'programmatic';
+  private hideReason: DrawerHideEvent['reason'] = 'programmatic';
   private leaveTimer: ReturnType<typeof setTimeout> | null = null;
   private enterTimer: ReturnType<typeof setTimeout> | null = null;
   private scrollBlocked = false;
@@ -185,7 +185,7 @@ export class NgbSidebarComponent implements OnDestroy {
   }
 
   /** Close the sidebar. */
-  close(reason: SidebarHideEvent['reason'] = 'programmatic'): void {
+  close(reason: DrawerHideEvent['reason'] = 'programmatic'): void {
     if (!this.visible()) return;
     this.hideReason = reason;
     this.visible.set(false);
@@ -279,7 +279,7 @@ export class NgbSidebarComponent implements OnDestroy {
     const items = this.focusables();
     const target =
       items.find((el) => el.hasAttribute('autofocus')) ??
-      items.find((el) => !el.classList.contains('ngb-sidebar-close')) ??
+      items.find((el) => !el.classList.contains('ngb-drawer-close')) ??
       items[0] ??
       this.container()?.nativeElement;
     target?.focus();
@@ -289,7 +289,7 @@ export class NgbSidebarComponent implements OnDestroy {
   private isTopMost(): boolean {
     const mine = this.zIndex() ?? 0;
     return Array.from(
-      this.document.querySelectorAll<HTMLElement>('.ngb-sidebar.ngb-sidebar-active'),
+      this.document.querySelectorAll<HTMLElement>('.ngb-drawer.ngb-drawer-active'),
     ).every((e) => (Number(e.style.zIndex) || 0) <= mine);
   }
 

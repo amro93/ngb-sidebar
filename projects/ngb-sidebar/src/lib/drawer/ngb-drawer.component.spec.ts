@@ -1,21 +1,21 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbSidebarComponent } from './ngb-sidebar.component';
+import { NgbDrawerComponent } from './ngb-drawer.component';
 import {
-  NgbSidebarFooterDirective,
-  NgbSidebarHeadlessDirective,
-  NgbSidebarHeaderDirective,
-} from './ngb-sidebar.templates';
-import { SidebarHideEvent, SidebarPosition } from './ngb-sidebar.interface';
+  NgbDrawerFooterDirective,
+  NgbDrawerHeadlessDirective,
+  NgbDrawerHeaderDirective,
+} from './ngb-drawer.templates';
+import { DrawerHideEvent, DrawerPosition } from './ngb-drawer.interface';
 
 const wait = (ms = 0) => new Promise((r) => setTimeout(r, ms));
 
 @Component({
   standalone: true,
-  imports: [NgbSidebarComponent],
+  imports: [NgbDrawerComponent],
   template: `
     <button id="opener">open</button>
-    <ngb-sidebar
+    <ngb-drawer
       [(visible)]="visible"
       [position]="position()"
       [fullScreen]="fullScreen()"
@@ -34,12 +34,12 @@ const wait = (ms = 0) => new Promise((r) => setTimeout(r, ms));
     >
       <input id="first" />
       <button id="last">x</button>
-    </ngb-sidebar>
+    </ngb-drawer>
   `,
 })
 class HostComponent {
   visible = signal(false);
-  position = signal<SidebarPosition>('left');
+  position = signal<DrawerPosition>('left');
   fullScreen = signal(false);
   modal = signal(true);
   dismissible = signal(true);
@@ -49,29 +49,31 @@ class HostComponent {
   appendTo = signal<'body' | 'self'>('body');
   size = signal<string | undefined>(undefined);
   shown = 0;
-  hidden: SidebarHideEvent[] = [];
+  hidden: DrawerHideEvent[] = [];
 }
 
 @Component({
   standalone: true,
   imports: [
-    NgbSidebarComponent,
-    NgbSidebarHeaderDirective,
-    NgbSidebarFooterDirective,
-    NgbSidebarHeadlessDirective,
+    NgbDrawerComponent,
+    NgbDrawerHeaderDirective,
+    NgbDrawerFooterDirective,
+    NgbDrawerHeadlessDirective,
   ],
   template: `
-    <ngb-sidebar [(visible)]="a" [transitionDuration]="0">
-      <ng-template ngbSidebarHeader><span class="custom-header">H</span></ng-template>
-      <ng-template ngbSidebarFooter let-close
+    <ngb-drawer [(visible)]="a" [transitionDuration]="0">
+      <ng-template ngbDrawerHeader><span class="custom-header">H</span></ng-template>
+      <ng-template ngbDrawerFooter let-close
         ><button class="custom-footer" (click)="close()">F</button></ng-template
       >
-    </ngb-sidebar>
-    <ngb-sidebar [(visible)]="b" [transitionDuration]="0" appendTo="self">
-      <ng-template ngbSidebarHeadless let-close
-        ><div class="headless"><button class="hl-close" (click)="close()">c</button></div></ng-template
+    </ngb-drawer>
+    <ngb-drawer [(visible)]="b" [transitionDuration]="0" appendTo="self">
+      <ng-template ngbDrawerHeadless let-close
+        ><div class="headless">
+          <button class="hl-close" (click)="close()">c</button>
+        </div></ng-template
       >
-    </ngb-sidebar>
+    </ngb-drawer>
   `,
 })
 class TemplatesHost {
@@ -79,10 +81,10 @@ class TemplatesHost {
   b = signal(false);
 }
 
-const panel = () => document.querySelector<HTMLElement>('.ngb-sidebar');
-const mask = () => document.querySelector<HTMLElement>('.ngb-sidebar-mask');
+const panel = () => document.querySelector<HTMLElement>('.ngb-drawer');
+const mask = () => document.querySelector<HTMLElement>('.ngb-drawer-mask');
 
-describe('NgbSidebarComponent', () => {
+describe('NgbDrawerComponent', () => {
   let fixture: ComponentFixture<HostComponent>;
   let host: HostComponent;
 
@@ -114,13 +116,13 @@ describe('NgbSidebarComponent', () => {
   it('opens, applies position class, header, aria and emits onShow', async () => {
     await open();
     const p = panel()!;
-    expect(p.classList).toContain('ngb-sidebar-left');
-    expect(p.classList).toContain('ngb-sidebar-active');
+    expect(p.classList).toContain('ngb-drawer-left');
+    expect(p.classList).toContain('ngb-drawer-active');
     expect(p.classList).toContain('my-panel');
     expect(p.getAttribute('role')).toBe('dialog');
     expect(p.getAttribute('aria-modal')).toBe('true');
     expect(p.querySelector('h5')!.textContent).toContain('Title');
-    expect(p.getAttribute('aria-labelledby')).toBe(p.querySelector('.ngb-sidebar-title')!.id);
+    expect(p.getAttribute('aria-labelledby')).toBe(p.querySelector('.ngb-drawer-title')!.id);
     expect(host.shown).toBe(1);
   });
 
@@ -134,12 +136,12 @@ describe('NgbSidebarComponent', () => {
     expect(fixture.nativeElement.contains(panel())).toBe(true);
   });
 
-  it.each<SidebarPosition>(['left', 'right', 'top', 'bottom', 'full'])(
+  it.each<DrawerPosition>(['left', 'right', 'top', 'bottom', 'full'])(
     'supports position %s',
     async (pos) => {
       host.position.set(pos);
       await open();
-      expect(panel()!.classList).toContain(`ngb-sidebar-${pos}`);
+      expect(panel()!.classList).toContain(`ngb-drawer-${pos}`);
     },
   );
 
@@ -147,7 +149,7 @@ describe('NgbSidebarComponent', () => {
     host.position.set('right');
     host.fullScreen.set(true);
     await open();
-    expect(panel()!.classList).toContain('ngb-sidebar-full');
+    expect(panel()!.classList).toContain('ngb-drawer-full');
     expect(document.body.style.overflow).toBe('hidden');
     host.visible.set(false);
     await settle();
@@ -173,7 +175,7 @@ describe('NgbSidebarComponent', () => {
 
   it('closes via close button and updates two-way binding', async () => {
     await open();
-    panel()!.querySelector<HTMLButtonElement>('.ngb-sidebar-close')!.click();
+    panel()!.querySelector<HTMLButtonElement>('.ngb-drawer-close')!.click();
     await settle();
     expect(host.visible()).toBe(false);
     expect(panel()).toBeNull();
@@ -222,7 +224,7 @@ describe('NgbSidebarComponent', () => {
   it('closable=false hides the close button and ignores Escape', async () => {
     host.closable.set(false);
     await open();
-    expect(panel()!.querySelector('.ngb-sidebar-close')).toBeNull();
+    expect(panel()!.querySelector('.ngb-drawer-close')).toBeNull();
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     await settle();
     expect(host.visible()).toBe(true);
@@ -235,7 +237,7 @@ describe('NgbSidebarComponent', () => {
     expect(document.activeElement!.id).toBe('first');
     (document.querySelector('#last') as HTMLElement).focus();
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', cancelable: true }));
-    expect(document.activeElement!.classList).toContain('ngb-sidebar-close');
+    expect(document.activeElement!.classList).toContain('ngb-drawer-close');
     document.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, cancelable: true }),
     );
@@ -253,7 +255,7 @@ describe('NgbSidebarComponent', () => {
   });
 });
 
-describe('NgbSidebarComponent templates', () => {
+describe('NgbDrawerComponent templates', () => {
   it('renders header/footer templates and headless template with close()', async () => {
     await TestBed.configureTestingModule({ imports: [TemplatesHost] }).compileComponents();
     const f = TestBed.createComponent(TemplatesHost);
@@ -273,7 +275,7 @@ describe('NgbSidebarComponent templates', () => {
     f.detectChanges();
     const hl = f.nativeElement.querySelector('.headless');
     expect(hl).not.toBeNull();
-    expect(f.nativeElement.querySelectorAll('.ngb-sidebar-header').length).toBe(0);
+    expect(f.nativeElement.querySelectorAll('.ngb-drawer-header').length).toBe(0);
     (f.nativeElement.querySelector('.hl-close') as HTMLElement).click();
     f.detectChanges();
     expect(f.componentInstance.b()).toBe(false);
@@ -281,6 +283,6 @@ describe('NgbSidebarComponent templates', () => {
   });
 
   it('exposes VERSION', () => {
-    expect(NgbSidebarComponent.VERSION).toMatch(/\d+\.\d+\.\d+/);
+    expect(NgbDrawerComponent.VERSION).toMatch(/\d+\.\d+\.\d+/);
   });
 });

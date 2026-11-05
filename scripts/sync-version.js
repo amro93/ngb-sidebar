@@ -28,21 +28,16 @@ if (fs.existsSync(distPkgPath)) {
 const versionTsPath = path.join(__dirname, '..', 'src', 'version.ts');
 fs.writeFileSync(versionTsPath, `export const APP_VERSION = '${version}';\n`);
 
-// 4. Sync src/lib/ngb-sidebar.interface.ts and projects/ngb-sidebar/src/lib/ngb-sidebar.interface.ts
-const syncVersionConst = (filePath) => {
-  if (fs.existsSync(filePath)) {
-    let content = fs.readFileSync(filePath, 'utf-8');
-    content = content.replace(
-      /export const NGB_SIDEBAR_VERSION = '.*?';/,
-      `export const NGB_SIDEBAR_VERSION = '${version}';`,
-    );
-    fs.writeFileSync(filePath, content);
-  }
-};
-
-syncVersionConst(path.join(__dirname, '..', 'src', 'lib', 'ngb-sidebar.interface.ts'));
-syncVersionConst(
-  path.join(__dirname, '..', 'projects', 'ngb-sidebar', 'src', 'lib', 'ngb-sidebar.interface.ts'),
+// 4. Sync the library version constant (used by NgbSidebarComponent.VERSION / NgbDrawerComponent.VERSION)
+const libVersionPath = path.join(
+  __dirname,
+  '..',
+  'projects',
+  'ngb-sidebar',
+  'src',
+  'lib',
+  'version.ts',
 );
+fs.writeFileSync(libVersionPath, `export const NGB_SIDEBAR_VERSION = '${version}';\n`);
 
 console.log(`Successfully synced version v${version}!`);

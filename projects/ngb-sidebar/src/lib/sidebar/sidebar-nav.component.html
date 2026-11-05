@@ -1,0 +1,184 @@
+<!-- Top level: groups, separators and plain items -->
+@for (item of model(); track item.id ?? $index) {
+  @if (isVisible(item)) {
+    @if (item.separator) {
+      <ngb-sidebar-separator />
+    } @else if (item.group) {
+      <ngb-sidebar-group
+        [class]="item.styleClass ?? ''"
+        [collapsible]="collapsibleGroups()"
+        [open]="item.expanded !== false"
+      >
+        @if (item.label) {
+          <ngb-sidebar-group-label>
+            @if (item.icon) {
+              <i [class]="item.icon" aria-hidden="true"></i>
+            }
+            <span>{{ item.label }}</span>
+            @if (collapsibleGroups()) {
+              <i class="ngb-sidebar-chevron ngb-sidebar-group-chevron" aria-hidden="true"></i>
+            }
+          </ngb-sidebar-group-label>
+        }
+        <ngb-sidebar-group-content>
+          <ngb-sidebar-menu>
+            <ng-container
+              *ngTemplateOutlet="list; context: { $implicit: item.items ?? [], depth: 0 }"
+            ></ng-container>
+          </ngb-sidebar-menu>
+        </ngb-sidebar-group-content>
+      </ngb-sidebar-group>
+    } @else {
+      <ngb-sidebar-group>
+        <ngb-sidebar-menu>
+          <ng-container
+            *ngTemplateOutlet="entry; context: { $implicit: item, depth: 0, siblings: model() }"
+          ></ng-container>
+        </ngb-sidebar-menu>
+      </ngb-sidebar-group>
+    }
+  }
+}
+
+<!-- A list of items at a given depth -->
+<ng-template #list let-items let-depth="depth">
+  @for (child of items; track child.id ?? $index) {
+    @if (isVisible(child)) {
+      @if (child.separator) {
+        <ngb-sidebar-separator />
+      } @else {
+        <ng-container
+          *ngTemplateOutlet="entry; context: { $implicit: child, depth: depth, siblings: items }"
+        ></ng-container>
+      }
+    }
+  }
+</ng-template>
+
+<!-- One item (recursive) -->
+<ng-template #entry let-item let-depth="depth" let-siblings="siblings">
+  @if (depth === 0) {
+    <ngb-sidebar-menu-item
+      [class]="item.styleClass ?? ''"
+      [collapsible]="hasChildren(item)"
+      [open]="isExpanded(item)"
+      (openChange)="setExpanded(item, $event, siblings)"
+      [attr.data-active-child]="hasActiveChild(item) || null"
+    >
+      @if (item.url && !hasChildren(item)) {
+        <a
+          ngbSidebarMenuButton
+          [href]="item.url"
+          [attr.target]="item.target ?? null"
+          [isActive]="isActive(item)"
+          [tooltip]="item.tooltip ?? item.label"
+          [attr.aria-disabled]="item.disabled || null"
+          (click)="onItemClick($event, item)"
+        >
+          <ng-container
+            *ngTemplateOutlet="content; context: { $implicit: item, depth: depth }"
+          ></ng-container>
+        </a>
+      } @else {
+        <button
+          type="button"
+          ngbSidebarMenuButton
+          [isActive]="isActive(item)"
+          [tooltip]="item.tooltip ?? item.label"
+          [disabled]="item.disabled"
+          (click)="onItemClick($event, item)"
+        >
+          <ng-container
+            *ngTemplateOutlet="content; context: { $implicit: item, depth: depth }"
+          ></ng-container>
+        </button>
+      }
+      <ng-container *ngTemplateOutlet="extras; context: { $implicit: item }"></ng-container>
+      @if (hasChildren(item)) {
+        <ngb-sidebar-menu-sub>
+          <ng-container
+            *ngTemplateOutlet="list; context: { $implicit: item.items, depth: depth + 1 }"
+          ></ng-container>
+        </ngb-sidebar-menu-sub>
+      }
+    </ngb-sidebar-menu-item>
+  } @else {
+    <ngb-sidebar-menu-sub-item
+      [class]="item.styleClass ?? ''"
+      [collapsible]="hasChildren(item)"
+      [open]="isExpanded(item)"
+      (openChange)="setExpanded(item, $event, siblings)"
+      [attr.data-active-child]="hasActiveChild(item) || null"
+    >
+      @if (item.url && !hasChildren(item)) {
+        <a
+          ngbSidebarMenuSubButton
+          [href]="item.url"
+          [attr.target]="item.target ?? null"
+          [isActive]="isActive(item)"
+          [attr.aria-disabled]="item.disabled || null"
+          (click)="onItemClick($event, item)"
+        >
+          <ng-container
+            *ngTemplateOutlet="content; context: { $implicit: item, depth: depth }"
+          ></ng-container>
+        </a>
+      } @else {
+        <button
+          type="button"
+          ngbSidebarMenuSubButton
+          [isActive]="isActive(item)"
+          [disabled]="item.disabled"
+          (click)="onItemClick($event, item)"
+        >
+          <ng-container
+            *ngTemplateOutlet="content; context: { $implicit: item, depth: depth }"
+          ></ng-container>
+        </button>
+      }
+      <ng-container *ngTemplateOutlet="extras; context: { $implicit: item }"></ng-container>
+      @if (hasChildren(item)) {
+        <ngb-sidebar-menu-sub>
+          <ng-container
+            *ngTemplateOutlet="list; context: { $implicit: item.items, depth: depth + 1 }"
+          ></ng-container>
+        </ngb-sidebar-menu-sub>
+      }
+    </ngb-sidebar-menu-sub-item>
+  }
+</ng-template>
+
+<!-- Button content -->
+<ng-template #content let-item let-depth="depth">
+  @if (itemTpl(); as tpl) {
+    <ng-container *ngTemplateOutlet="tpl.templateRef; context: ctx(item, depth)"></ng-container>
+  } @else {
+    @if (item.icon) {
+      <i [class]="item.icon + ' ngb-sidebar-icon'" aria-hidden="true"></i>
+    }
+    <span class="ngb-sidebar-label">{{ item.label }}</span>
+    @if (hasChildren(item)) {
+      <i class="ngb-sidebar-chevron" aria-hidden="true"></i>
+    }
+  }
+</ng-template>
+
+<!-- Badge and action -->
+<ng-template #extras let-item>
+  @if (item.badge !== undefined && item.badge !== null && item.badge !== '') {
+    <ngb-sidebar-menu-badge [class]="item.badgeClass ?? ''">{{
+      item.badge
+    }}</ngb-sidebar-menu-badge>
+  }
+  @if (item.actionIcon) {
+    <button
+      type="button"
+      ngbSidebarMenuAction
+      [showOnHover]="item.actionOnHover !== false"
+      [attr.aria-label]="item.actionLabel ?? 'More'"
+      (click)="onActionClick($event, item)"
+    >
+      <i [class]="item.actionIcon" aria-hidden="true"></i>
+    </button>
+  }
+</ng-template>

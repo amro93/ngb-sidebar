@@ -1,0 +1,595 @@
+// ngb-sidebar – compound navigation sidebar. Unencapsulated: styles every ngb-sidebar-* part.
+// Theme through the CSS variables below (they fall back to Bootstrap 5.3 tokens).
+
+.ngb-sidebar-layout {
+  --ngb-sidebar-bg: var(--bs-tertiary-bg, #f8f9fa);
+  --ngb-sidebar-color: var(--bs-body-color, #212529);
+  --ngb-sidebar-muted: var(--bs-secondary-color, rgba(33, 37, 41, 0.75));
+  --ngb-sidebar-border-color: var(--bs-border-color, #dee2e6);
+  --ngb-sidebar-hover-bg: var(--bs-secondary-bg, #e9ecef);
+  --ngb-sidebar-active-bg: var(--bs-primary-bg-subtle, #cfe2ff);
+  --ngb-sidebar-active-color: var(--bs-primary-text-emphasis, #052c65);
+  --ngb-sidebar-focus-ring: 0 0 0 0.2rem rgba(var(--bs-primary-rgb, 13, 110, 253), 0.35);
+  --ngb-sidebar-radius: var(--bs-border-radius, 0.375rem);
+  --ngb-sidebar-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ngb-sidebar-z: 1020;
+  --ngb-sidebar-backdrop: rgba(0, 0, 0, 0.45);
+
+  position: relative;
+  display: flex;
+  width: 100%;
+  isolation: isolate;
+  background: var(--bs-body-bg, #fff);
+  color: var(--bs-body-color, #212529);
+
+  &.ngb-sidebar-layout-fill {
+    min-height: 100vh;
+  }
+  &.ngb-sidebar-layout-inset {
+    background: var(--ngb-sidebar-bg);
+  }
+}
+
+.ngb-sidebar-main {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  order: 1;
+  background: var(--bs-body-bg, #fff);
+
+  .ngb-sidebar-layout-inset > & {
+    margin: 0.5rem;
+    border-radius: calc(var(--ngb-sidebar-radius) * 2);
+    box-shadow: var(--bs-box-shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075));
+    overflow: hidden;
+  }
+  .ngb-sidebar-layout-inset > .ngb-sidebar[data-side='left'] ~ & {
+    margin-left: 0;
+  }
+}
+
+// ---------------------------------------------------------------- sidebar shell
+
+.ngb-sidebar {
+  --_w: var(--ngb-sidebar-width, 16rem);
+  --_wi: var(--ngb-sidebar-width-icon, 3rem);
+  --_gap: 0px;
+
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  order: 0;
+  color: var(--ngb-sidebar-color);
+
+  &[data-side='right'] {
+    order: 2;
+  }
+  &[data-variant='floating'],
+  &[data-variant='inset'] {
+    --_gap: 1rem;
+  }
+}
+
+.ngb-sidebar-spacer {
+  width: 0;
+  height: 100%;
+  transition: width var(--ngb-sidebar-transition);
+
+  [data-collapsible='icon'] > & {
+    width: calc(var(--_wi) + var(--_gap));
+  }
+  .ngb-sidebar-pushing > & {
+    width: var(--_w);
+  }
+}
+
+.ngb-sidebar-aside {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--ngb-sidebar-z);
+  display: flex;
+  width: var(--_w);
+  transition:
+    width var(--ngb-sidebar-transition),
+    transform var(--ngb-sidebar-transition),
+    box-shadow var(--ngb-sidebar-transition);
+
+  [data-side='right'] > & {
+    left: auto;
+    right: 0;
+  }
+  [data-variant='floating'] > &,
+  [data-variant='inset'] > & {
+    padding: 0.5rem;
+  }
+
+  // Collapsed states
+  [data-state='collapsed'][data-collapsible='icon'] > & {
+    width: calc(var(--_wi) + var(--_gap));
+  }
+  [data-state='collapsed'][data-collapsible='offcanvas'][data-side='left'] > & {
+    transform: translateX(-100%);
+  }
+  [data-state='collapsed'][data-collapsible='offcanvas'][data-side='right'] > & {
+    transform: translateX(100%);
+  }
+  [data-state='collapsed'][data-collapsible='offcanvas'] > & {
+    visibility: hidden;
+    transition:
+      transform var(--ngb-sidebar-transition),
+      visibility 0s linear 200ms;
+  }
+  // Expanded above the content (overlay / hover)
+  .ngb-sidebar-floating-panel > & {
+    z-index: calc(var(--ngb-sidebar-z) + 10);
+  }
+}
+
+.ngb-sidebar-panel {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  max-height: 100%;
+  background: var(--ngb-sidebar-bg);
+
+  [data-variant='sidebar'][data-side='left'] > .ngb-sidebar-aside > & {
+    border-right: 1px solid var(--ngb-sidebar-border-color);
+  }
+  [data-variant='sidebar'][data-side='right'] > .ngb-sidebar-aside > & {
+    border-left: 1px solid var(--ngb-sidebar-border-color);
+  }
+  [data-variant='floating'] > .ngb-sidebar-aside > & {
+    top: 0.5rem;
+    height: calc(100vh - 1rem);
+    border: 1px solid var(--ngb-sidebar-border-color);
+    border-radius: calc(var(--ngb-sidebar-radius) * 2);
+    box-shadow: var(--bs-box-shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075));
+  }
+  [data-variant='inset'] > .ngb-sidebar-aside > & {
+    background: transparent;
+  }
+  .ngb-sidebar-floating-panel > .ngb-sidebar-aside > & {
+    box-shadow: var(--bs-box-shadow-lg, 0 1rem 3rem rgba(0, 0, 0, 0.175));
+  }
+  .ngb-sidebar-floating-panel[data-variant='inset'] > .ngb-sidebar-aside > & {
+    background: var(--ngb-sidebar-bg);
+    border-radius: calc(var(--ngb-sidebar-radius) * 2);
+  }
+}
+
+// Backdrops
+.ngb-sidebar-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--ngb-sidebar-z) + 5);
+  background: var(--ngb-sidebar-backdrop);
+  animation: ngb-sidebar-fade var(--ngb-sidebar-transition);
+
+  .ngb-sidebar > & {
+    position: fixed; // sidebar used without a layout
+  }
+  .ngb-sidebar-layout > & {
+    order: 3;
+  }
+}
+.ngb-sidebar-backdrop-standalone:not(.ngb-sidebar-backdrop-visible) {
+  display: none;
+}
+@keyframes ngb-sidebar-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+// Rail
+.ngb-sidebar-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: col-resize;
+  right: -0.375rem;
+
+  [data-side='right'] & {
+    right: auto;
+    left: -0.375rem;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    transition: background-color var(--ngb-sidebar-transition);
+  }
+  &:hover::after {
+    background: var(--ngb-sidebar-border-color);
+  }
+  [data-state='collapsed'] & {
+    cursor: e-resize;
+  }
+  [data-state='collapsed'][data-side='right'] &,
+  [data-state='expanded'][data-side='left'] & {
+    cursor: w-resize;
+  }
+  [data-state='expanded'][data-side='right'] & {
+    cursor: e-resize;
+  }
+}
+
+// ---------------------------------------------------------------- structure
+
+.ngb-sidebar-header,
+.ngb-sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.ngb-sidebar-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+
+  .ngb-sidebar[data-state='collapsed'][data-collapsible='icon'] & {
+    overflow: hidden;
+  }
+}
+
+.ngb-sidebar-separator {
+  display: block;
+  height: 1px;
+  margin: 0.25rem 0.5rem;
+  background: var(--ngb-sidebar-border-color);
+}
+
+.ngb-sidebar-nav {
+  display: contents;
+}
+
+.ngb-sidebar-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0 0.5rem;
+
+  &[data-collapsible][data-open='false'] > .ngb-sidebar-group-content {
+    display: none;
+  }
+}
+
+.ngb-sidebar-group-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  overflow: hidden;
+  border-radius: var(--ngb-sidebar-radius);
+  color: var(--ngb-sidebar-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  transition:
+    margin var(--ngb-sidebar-transition),
+    opacity var(--ngb-sidebar-transition);
+  outline: 0;
+
+  &[role='button'] {
+    cursor: pointer;
+    &:hover {
+      color: var(--ngb-sidebar-color);
+    }
+  }
+  &:focus-visible {
+    box-shadow: var(--ngb-sidebar-focus-ring);
+  }
+  .ngb-sidebar-group-chevron {
+    margin-left: auto;
+  }
+  [data-open='true'] > & .ngb-sidebar-group-chevron::before {
+    transform: rotate(45deg);
+  }
+  [data-open='false'] > & .ngb-sidebar-group-chevron::before {
+    transform: rotate(-45deg);
+  }
+}
+
+.ngb-sidebar-group-action {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.75rem;
+}
+
+.ngb-sidebar-group-content {
+  display: block;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+// ---------------------------------------------------------------- menu
+
+.ngb-sidebar-menu,
+.ngb-sidebar-menu-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ngb-sidebar-menu-item {
+  position: relative;
+  display: block;
+
+  &[data-collapsible]:not([data-open='true']) > .ngb-sidebar-menu-sub {
+    display: none;
+  }
+}
+
+.ngb-sidebar-menu-sub {
+  margin: 0.125rem 0 0.125rem 0.875rem;
+  padding: 0.125rem 0 0.125rem 0.625rem;
+  border-left: 1px solid var(--ngb-sidebar-border-color);
+  animation: ngb-sidebar-sub-in var(--ngb-sidebar-transition);
+
+  [data-side='right'] & {
+    margin-left: 0.875rem;
+  }
+}
+@keyframes ngb-sidebar-sub-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+.ngb-sidebar-menu-button,
+.ngb-sidebar-menu-sub-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  padding: 0.5rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--ngb-sidebar-radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: 0;
+  transition:
+    width var(--ngb-sidebar-transition),
+    height var(--ngb-sidebar-transition),
+    padding var(--ngb-sidebar-transition),
+    background-color 120ms;
+
+  > span,
+  > .ngb-sidebar-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  > i,
+  > svg,
+  > img,
+  > .ngb-sidebar-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    font-size: 1rem;
+    line-height: 1;
+    text-align: center;
+  }
+  &:hover {
+    background: var(--ngb-sidebar-hover-bg);
+    color: var(--ngb-sidebar-color);
+  }
+  &:focus-visible {
+    box-shadow: var(--ngb-sidebar-focus-ring);
+  }
+  &[data-active] {
+    background: var(--ngb-sidebar-active-bg);
+    color: var(--ngb-sidebar-active-color);
+    font-weight: 500;
+  }
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  &[data-size='sm'] {
+    height: 1.75rem;
+    font-size: 0.75rem;
+  }
+  &[data-size='lg'] {
+    height: 3rem;
+  }
+}
+
+.ngb-sidebar-menu-sub-button {
+  height: 1.75rem;
+  color: var(--ngb-sidebar-muted);
+
+  &[data-active] {
+    color: var(--ngb-sidebar-active-color);
+  }
+}
+
+[data-active-child] > .ngb-sidebar-menu-button,
+[data-active-child] > .ngb-sidebar-menu-sub-button {
+  color: var(--ngb-sidebar-color);
+  font-weight: 500;
+}
+
+// leave room for badge / action
+.ngb-sidebar-menu-item:has(> .ngb-sidebar-menu-badge) > .ngb-sidebar-menu-button,
+.ngb-sidebar-menu-item:has(> .ngb-sidebar-menu-action) > .ngb-sidebar-menu-button,
+.ngb-sidebar-menu-item:has(> .ngb-sidebar-menu-badge) > .ngb-sidebar-menu-sub-button,
+.ngb-sidebar-menu-item:has(> .ngb-sidebar-menu-action) > .ngb-sidebar-menu-sub-button {
+  padding-right: 2.25rem;
+}
+
+// Chevron (pure CSS, no icon font needed)
+.ngb-sidebar-chevron {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+
+  &::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--ngb-sidebar-transition);
+  }
+  [data-open='true'] > .ngb-sidebar-menu-button > &::before,
+  [data-open='true'] > .ngb-sidebar-menu-sub-button > &::before {
+    transform: rotate(45deg);
+  }
+}
+// Rotate user-supplied chevron icons too (class "ngb-sidebar-rotate").
+.ngb-sidebar-rotate {
+  margin-left: auto;
+  transition: transform var(--ngb-sidebar-transition);
+  [data-open='true'] > * > & {
+    transform: rotate(180deg);
+  }
+}
+
+.ngb-sidebar-menu-badge {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: 999px;
+  background: var(--ngb-sidebar-hover-bg);
+  color: var(--ngb-sidebar-color);
+  font-size: 0.7rem;
+  font-weight: 600;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ngb-sidebar-menu-action {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ngb-sidebar-radius);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  outline: 0;
+
+  &:hover {
+    background: var(--ngb-sidebar-hover-bg);
+  }
+  &:focus-visible {
+    box-shadow: var(--ngb-sidebar-focus-ring);
+  }
+  &[data-show-on-hover] {
+    opacity: 0;
+  }
+  .ngb-sidebar-menu-item:hover > &[data-show-on-hover],
+  .ngb-sidebar-menu-item:focus-within > &[data-show-on-hover],
+  &[data-show-on-hover][aria-expanded='true'] {
+    opacity: 1;
+  }
+}
+.ngb-sidebar-menu-item:has(> .ngb-sidebar-menu-sub-button) > .ngb-sidebar-menu-action {
+  top: 0.125rem;
+}
+
+// ---------------------------------------------------------------- icon-collapsed mode
+
+.ngb-sidebar[data-state='collapsed'][data-collapsible='icon'] {
+  .ngb-sidebar-group-label {
+    margin-top: -2rem;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ngb-sidebar-group-action,
+  .ngb-sidebar-menu-badge,
+  .ngb-sidebar-menu-action,
+  .ngb-sidebar-menu-sub,
+  .ngb-sidebar-hide-collapsed {
+    display: none !important;
+  }
+  .ngb-sidebar-menu-button {
+    width: 2rem !important;
+    padding: 0.5rem !important;
+
+    &[data-size='lg'] {
+      width: 2rem !important;
+      height: 2rem;
+      padding: 0 !important;
+    }
+    // Only the first child (icon, logo or avatar) stays visible.
+    > :not(:first-child) {
+      display: none !important;
+    }
+  }
+  // collapsed parent of the active page
+  [data-active-child] > .ngb-sidebar-menu-button {
+    background: var(--ngb-sidebar-active-bg);
+    color: var(--ngb-sidebar-active-color);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ngb-sidebar-layout,
+  .ngb-sidebar-layout * {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}
