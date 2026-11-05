@@ -1,0 +1,70 @@
+name: Deploy Demo
+
+# Runs only after CI is green, so a failing build never reaches the demo site.
+# The push trigger lives on the CI workflow; duplicating it here would race it.
+on:
+  workflow_run:
+    workflows: ['CI & Publish NPM Package']
+    types: [completed]
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  # Build Demo Application and Deploy to GitHub Pages
+  build-and-deploy-demo:
+    name: Build & Deploy Demo App
+    runs-on: ubuntu-latest
+    # A manual dispatch has no upstream run to inspect; otherwise demand success.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # workflow_run reports the commit CI validated, not necessarily the tip.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Demo App
+        run: npm run build:demo -- --base-href=/ngb-sidebar/
+
+      # SPA Fallback for GitHub Pages routing & disable Jekyll
+      - name: Copy index.html to 404.html and create .nojekyll
+        run: |
+          cp ./dist/ngb-sidebar-app/browser/index.html ./dist/ngb-sidebar-app/browser/404.html
+          touch ./dist/ngb-sidebar-app/browser/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist/ngb-sidebar-app/browser
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

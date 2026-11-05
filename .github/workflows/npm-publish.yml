@@ -1,0 +1,95 @@
+name: CI & Publish NPM Package
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Never let two publishes race; a queued run is pointless once a newer
+# commit is publishing, but don't cancel one mid-upload.
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  # Verify across every Node version we claim to support. The publish job
+  # below is gated on this, so a red build never reaches the registry.
+  test:
+    name: Test & Build (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm run test
+
+      - name: Build ngb-sidebar Library
+        run: npm run build:lib
+
+  publish:
+    name: Build and Publish to NPM
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for NPM Trusted Publishing (OIDC) & Provenance
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      # Node 22 ships npm 10.x, which has no OIDC support and fails with
+      # ENEEDAUTH. Trusted Publishing requires npm >= 11.5.1.
+      - name: Upgrade npm for Trusted Publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build ngb-sidebar Library
+        run: npm run build:lib
+
+      - name: Check if version is already published
+        id: check
+        run: |
+          NAME=$(node -p "require('./dist/ngb-sidebar/package.json').name")
+          VERSION=$(node -p "require('./dist/ngb-sidebar/package.json').version")
+          echo "Resolved $NAME@$VERSION"
+          if npm view "$NAME@$VERSION" version > /dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$NAME@$VERSION is already on npm - skipping publish."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # No NODE_AUTH_TOKEN / registry-url: the OIDC exchange handles auth, and
+      # provenance is generated automatically for trusted publishers.
+      - name: Publish to NPM
+        if: steps.check.outputs.published == 'false'
+        run: npm publish ./dist/ngb-sidebar --access public

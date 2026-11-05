@@ -1,0 +1,43 @@
+{
+  "name": "@amro93/ngb-sidebar",
+  "version": "0.1.0",
+  "description": "Lightweight, accessible, standalone Angular Sidebar (drawer) component built with pure Bootstrap 5",
+  "keywords": [
+    "angular",
+    "angular-sidebar",
+    "bootstrap",
+    "bootstrap-5",
+    "sidebar",
+    "drawer",
+    "offcanvas",
+    "standalone",
+    "ngb-sidebar"
+  ],
+  "author": "amro93",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amro93/ngb-sidebar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amro93/ngb-sidebar/issues"
+  },
+  "homepage": "https://github.com/amro93/ngb-sidebar#readme",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=18.0.0",
+    "@angular/core": ">=18.0.0",
+    "bootstrap": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "bootstrap": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

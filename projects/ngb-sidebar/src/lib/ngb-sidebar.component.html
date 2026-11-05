@@ -1,0 +1,68 @@
+@if (rendered()) {
+  <div #root class="ngb-sidebar-root">
+    @if (modal()) {
+      <div
+        class="ngb-sidebar-mask"
+        [class.ngb-sidebar-mask-active]="active()"
+        [ngClass]="maskStyleClass()"
+        [style.z-index]="maskZIndex()"
+        [style.transition-duration.ms]="transitionDuration()"
+        (click)="onMaskClick()"
+      ></div>
+    }
+    <div
+      #container
+      class="ngb-sidebar"
+      [id]="id"
+      [ngClass]="panelClasses()"
+      [ngStyle]="panelStyle()"
+      [style.z-index]="zIndex()"
+      role="dialog"
+      [attr.aria-modal]="modal()"
+      [attr.aria-label]="ariaLabel() ?? null"
+      [attr.aria-labelledby]="labelledBy()"
+      tabindex="-1"
+    >
+      @if (headlessTpl(); as headless) {
+        <ng-container *ngTemplateOutlet="headless.templateRef; context: tplContext"></ng-container>
+      } @else {
+        <div class="ngb-sidebar-header">
+          <div class="ngb-sidebar-title" [id]="headerId">
+            @if (headerTpl(); as h) {
+              <ng-container *ngTemplateOutlet="h.templateRef; context: tplContext"></ng-container>
+            } @else if (header()) {
+              <h5 class="m-0">{{ header() }}</h5>
+            }
+          </div>
+          @if (showCloseIcon() && closable()) {
+            <button
+              type="button"
+              class="ngb-sidebar-close"
+              [attr.aria-label]="ariaCloseLabel()"
+              (click)="close('close-button')"
+            >
+              @if (closeIconTpl(); as ci) {
+                <ng-container *ngTemplateOutlet="ci.templateRef; context: tplContext"></ng-container>
+              } @else if (closeIcon()) {
+                <i [class]="closeIcon()" aria-hidden="true"></i>
+              } @else {
+                <span class="btn-close" aria-hidden="true"></span>
+              }
+            </button>
+          }
+        </div>
+        <div class="ngb-sidebar-content">
+          <ng-content></ng-content>
+          @if (contentTpl(); as c) {
+            <ng-container *ngTemplateOutlet="c.templateRef; context: tplContext"></ng-container>
+          }
+        </div>
+        @if (footerTpl(); as f) {
+          <div class="ngb-sidebar-footer">
+            <ng-container *ngTemplateOutlet="f.templateRef; context: tplContext"></ng-container>
+          </div>
+        }
+      }
+    </div>
+  </div>
+}
