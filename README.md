@@ -297,6 +297,9 @@ npm run build:lib    # dist/ngb-sidebar
 npm run build:demo   # dist/ngb-sidebar-app
 ```
 
+Docs: [installation](docs/08-installation-guide.md), [CI/CD](docs/05-cicd-pipeline.md),
+[publishing](docs/PUBLISHING-GUIDE.md), [git & StackBlitz](docs/06-git-and-stackblitz.md).
+
 CI (`.github/workflows`): PR checks (prettier, tests, library + demo build), npm publish on `master`
 (trusted publishing, skipped when the version is already published) and GitHub Pages demo deploy after a
 green CI run. Bump with `npm run version:patch|minor|major` (syncs the library and demo version constants).
