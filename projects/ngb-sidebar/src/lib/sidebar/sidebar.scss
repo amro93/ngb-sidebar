@@ -104,6 +104,16 @@
   [data-state='collapsed'][data-collapsible='offcanvas'][data-side='right'] > & {
     transform: translateX(calc(100% * var(--_dir)));
   }
+  // Pushing (in-flow) sidebar: hide the panel the moment it collapses, so its content is not
+  // dragged across the main area while the spacer animates. Overlay drawers keep the slide-out.
+  .ngb-sidebar:not(.ngb-sidebar-overlay)[data-state='collapsed'][data-collapsible='offcanvas'] > & {
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      transform var(--ngb-sidebar-transition),
+      opacity 0s,
+      visibility 0s;
+  }
   .ngb-sidebar-floating-panel > & {
     z-index: calc(var(--ngb-sidebar-z) + 10);
   }
