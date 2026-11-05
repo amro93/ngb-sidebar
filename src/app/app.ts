@@ -18,6 +18,7 @@ import { ModelDemo } from './demos/model-demo';
 import { MultiDemo } from './demos/multi-demo';
 import { NestedDemo } from './demos/nested-demo';
 import { ResponsiveDemo } from './demos/responsive-demo';
+import { RtlDemo } from './demos/rtl-demo';
 import { VariantsDemo } from './demos/variants-demo';
 
 const INSTALL = `npm install @amro93/ngb-sidebar bootstrap bootstrap-icons`;
@@ -81,6 +82,7 @@ export class Shell {}`;
     ChatDemo,
     ConfigDemo,
     DrawerDemo,
+    RtlDemo,
   ],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -104,13 +106,14 @@ export class App {
     chat: ChatDemo,
     config: ConfigDemo,
     drawer: DrawerDemo,
+    rtl: RtlDemo,
   };
 
   readonly links: DemoLink[] = [
     { id: 'getting-started', label: 'Getting Started', icon: 'bi bi-rocket-takeoff' },
     { id: 'variants', label: 'Variants Playground', icon: 'bi bi-sliders' },
     { id: 'with-menu', label: 'With Menu', icon: 'bi bi-menu-button-wide' },
-    { id: 'responsive', label: 'Responsive', icon: 'bi bi-phone' },
+    { id: 'responsive', label: 'Responsive & Mobile', icon: 'bi bi-phone' },
     { id: 'dual', label: 'Dual Sidebar', icon: 'bi bi-layout-three-columns' },
     { id: 'multi', label: 'Multi Sidebar', icon: 'bi bi-layout-sidebar-inset' },
     { id: 'nested', label: 'Nested Menu', icon: 'bi bi-diagram-3' },
@@ -118,6 +121,7 @@ export class App {
     { id: 'chat', label: 'Chat Application', icon: 'bi bi-chat-dots' },
     { id: 'config', label: 'Configuration & Theming', icon: 'bi bi-palette' },
     { id: 'drawer', label: 'Drawer (overlay)', icon: 'bi bi-window-sidebar' },
+    { id: 'rtl', label: 'RTL & Arabic', icon: 'bi bi-translate' },
   ];
 
   toggleTheme(): void {

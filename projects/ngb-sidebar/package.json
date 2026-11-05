@@ -1,6 +1,6 @@
 {
   "name": "@amro93/ngb-sidebar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Composable Angular navigation sidebar (icon/offcanvas collapse, variants, nested menus) and overlay drawer, built with Bootstrap 5 classes",
   "keywords": [
     "angular",
@@ -15,17 +15,21 @@
     "bootstrap-5",
     "standalone",
     "signals",
-    "ngb-sidebar"
+    "ngb-sidebar",
+    "rtl",
+    "responsive",
+    "mobile"
   ],
   "author": "amro93",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amro93/ngb-sidebar.git"
+    "url": "git+https://github.com/amro93/ngb-sidebar.git",
+    "directory": "projects/ngb-sidebar"
   },
   "bugs": {
     "url": "https://github.com/amro93/ngb-sidebar/issues"
   },
-  "homepage": "https://github.com/amro93/ngb-sidebar#readme",
+  "homepage": "https://amro93.github.io/ngb-sidebar/",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

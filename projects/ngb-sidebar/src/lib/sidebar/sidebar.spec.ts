@@ -3,7 +3,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NGB_SIDEBAR } from './sidebar.module';
 import { NgbSidebarComponent } from './sidebar.component';
 import { NgbSidebarRegistry } from './sidebar.registry';
-import { NgbSidebarMenuItem, SidebarCollapsible, SidebarVariant } from './sidebar.types';
+import { provideNgbSidebarConfig } from './sidebar.config';
+import {
+  NgbSidebarMenuItem,
+  NgbSidebarMobileOptions,
+  SidebarCollapsible,
+  SidebarVariant,
+} from './sidebar.types';
 
 @Component({
   standalone: true,
@@ -383,5 +389,162 @@ describe('NgbSidebarNavComponent', () => {
     (fixture.nativeElement.querySelector('.ngb-sidebar-menu-action') as HTMLElement).click();
     expect(host.actions).toEqual(['Cmd']);
     expect((buttonOf('A2') as HTMLButtonElement).disabled).toBe(true);
+  });
+});
+
+@Component({
+  standalone: true,
+  imports: [...NGB_SIDEBAR],
+  template: `
+    <ngb-sidebar-layout [fill]="false">
+      <ngb-sidebar
+        id="m"
+        collapsible="icon"
+        variant="floating"
+        [breakpoint]="768"
+        [mobile]="mobile()"
+        [(open)]="open"
+      >
+        <ngb-sidebar-menu>
+          <ngb-sidebar-menu-item>
+            <button id="leaf" ngbSidebarMenuButton>Leaf</button>
+          </ngb-sidebar-menu-item>
+          <ngb-sidebar-menu-item>
+            <button id="keep" ngbSidebarMenuButton keepOpen>Keep</button>
+          </ngb-sidebar-menu-item>
+          <ngb-sidebar-menu-item>
+            <button id="dd" ngbSidebarMenuButton data-bs-toggle="dropdown">Dropdown</button>
+          </ngb-sidebar-menu-item>
+        </ngb-sidebar-menu>
+      </ngb-sidebar>
+      <ngb-sidebar-main />
+    </ngb-sidebar-layout>
+  `,
+})
+class MobileHost {
+  open = signal(true);
+  mobile = signal<Partial<NgbSidebarMobileOptions>>({});
+}
+
+describe('NgbSidebar mobile behavior', () => {
+  let matches = false;
+  let listeners: ((e: { matches: boolean }) => void)[] = [];
+  const original = globalThis.matchMedia;
+  let fixture: ComponentFixture<MobileHost>;
+  let host: MobileHost;
+  const el = (sel: string) => fixture.nativeElement.querySelector(sel) as HTMLElement;
+  const render = () => {
+    fixture.detectChanges();
+    TestBed.tick();
+    fixture.detectChanges();
+  };
+  const setViewport = (mobile: boolean) => {
+    matches = mobile;
+    listeners.forEach((l) => l({ matches: mobile }));
+    render();
+  };
+
+  function create(config?: Parameters<typeof provideNgbSidebarConfig>[0]) {
+    TestBed.configureTestingModule({
+      imports: [MobileHost],
+      providers: config ? [provideNgbSidebarConfig(config)] : [],
+    });
+    fixture = TestBed.createComponent(MobileHost);
+    host = fixture.componentInstance;
+    render();
+  }
+
+  beforeEach(() => {
+    matches = false;
+    listeners = [];
+    globalThis.matchMedia = ((query: string) => ({
+      get matches() {
+        return matches;
+      },
+      media: query,
+      addEventListener: (_: string, l: (e: { matches: boolean }) => void) => listeners.push(l),
+      removeEventListener: (_: string, l: (e: { matches: boolean }) => void) =>
+        (listeners = listeners.filter((x) => x !== l)),
+    })) as unknown as typeof matchMedia;
+  });
+
+  afterEach(() => {
+    fixture?.destroy();
+    globalThis.matchMedia = original;
+  });
+
+  it('uses the default mobile behavior below the breakpoint and restores desktop state', () => {
+    create();
+    const sb = el('ngb-sidebar');
+    expect(sb.dataset['mobile']).toBeUndefined();
+    setViewport(true);
+    expect(sb.dataset['mobile']).toBe('true');
+    expect(sb.dataset['collapsible']).toBe('offcanvas');
+    expect(sb.dataset['variant']).toBe('sidebar');
+    expect(sb.classList).toContain('ngb-sidebar-overlay');
+    expect(sb.style.getPropertyValue('--ngb-sidebar-width')).toBe('18rem');
+    expect(host.open()).toBe(false); // defaultOpen: false
+    host.open.set(true);
+    render();
+    expect(el('ngb-sidebar-layout > .ngb-sidebar-backdrop')).not.toBeNull();
+    setViewport(false);
+    expect(host.open()).toBe(true); // desktop state restored
+    expect(sb.dataset['collapsible']).toBe('icon');
+    expect(sb.dataset['variant']).toBe('floating');
+  });
+
+  it('closes after navigating on mobile, but not for keepOpen or dropdown toggles', () => {
+    create();
+    setViewport(true);
+    host.open.set(true);
+    render();
+    el('#keep').click();
+    el('#dd').click();
+    render();
+    expect(host.open()).toBe(true);
+    el('#leaf').click();
+    render();
+    expect(host.open()).toBe(false);
+  });
+
+  it('does not close after navigating on desktop', () => {
+    create();
+    el('#leaf').click();
+    render();
+    expect(host.open()).toBe(true);
+  });
+
+  it('applies the mobile input settings', () => {
+    create();
+    host.mobile.set({
+      collapsible: 'icon',
+      overlay: false,
+      backdrop: false,
+      defaultOpen: true,
+      closeOnNavigate: false,
+      side: 'right',
+      width: '80%',
+      variant: null,
+    });
+    render();
+    setViewport(true);
+    const sb = el('ngb-sidebar');
+    expect(host.open()).toBe(true);
+    expect(sb.dataset['collapsible']).toBe('icon');
+    expect(sb.dataset['side']).toBe('right');
+    expect(sb.dataset['variant']).toBe('floating');
+    expect(sb.classList).not.toContain('ngb-sidebar-overlay');
+    expect(sb.style.getPropertyValue('--ngb-sidebar-width')).toBe('80%');
+    expect(el('ngb-sidebar-layout > .ngb-sidebar-backdrop')).toBeNull();
+    el('#leaf').click();
+    render();
+    expect(host.open()).toBe(true);
+  });
+
+  it('takes app-wide defaults from provideNgbSidebarConfig', () => {
+    create({ mobile: { defaultOpen: true, side: 'right' } });
+    setViewport(true);
+    expect(host.open()).toBe(true);
+    expect(el('ngb-sidebar').dataset['side']).toBe('right');
   });
 });

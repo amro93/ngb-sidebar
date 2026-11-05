@@ -18,7 +18,14 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { NGB_SIDEBAR_VERSION } from '../version';
 import { NGB_SIDEBAR_LAYOUT, NgbSidebarRegistry } from './sidebar.registry';
-import { SidebarCollapsible, SidebarSide, SidebarState, SidebarVariant } from './sidebar.types';
+import { NGB_SIDEBAR_CONFIG, NGB_SIDEBAR_MOBILE_DEFAULTS } from './sidebar.config';
+import {
+  NgbSidebarMobileOptions,
+  SidebarCollapsible,
+  SidebarSide,
+  SidebarState,
+  SidebarVariant,
+} from './sidebar.types';
 
 let nextId = 0;
 
@@ -51,16 +58,16 @@ let nextId = 0;
   host: {
     class: 'ngb-sidebar',
     '[attr.id]': 'id()',
-    '[attr.data-variant]': 'variant()',
+    '[attr.data-variant]': 'effectiveVariant()',
     '[attr.data-collapsible]': 'effectiveCollapsible()',
-    '[attr.data-side]': 'side()',
+    '[attr.data-side]': 'effectiveSide()',
     '[attr.data-state]': 'state()',
     '[attr.data-mobile]': 'isMobile() || null',
     '[class.ngb-sidebar-overlay]': 'effectiveOverlay()',
     '[class.ngb-sidebar-expanded]': 'expanded()',
     '[class.ngb-sidebar-pushing]': 'pushing()',
     '[class.ngb-sidebar-floating-panel]': 'floatingPanel()',
-    '[style.--ngb-sidebar-width]': 'width()',
+    '[style.--ngb-sidebar-width]': 'effectiveWidth()',
     '[style.--ngb-sidebar-width-icon]': 'iconWidth()',
   },
 })
@@ -71,6 +78,7 @@ export class NgbSidebarComponent implements OnInit {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly registry = inject(NgbSidebarRegistry);
   private readonly layout = inject(NGB_SIDEBAR_LAYOUT, { optional: true });
+  private readonly config = inject(NGB_SIDEBAR_CONFIG);
 
   /** Id used by `ngbSidebarTrigger[target]` and `aria-controls`. */
   id = input<string>(`ngb-sidebar-${nextId++}`);
@@ -93,11 +101,16 @@ export class NgbSidebarComponent implements OnInit {
   iconWidth = input<string>('3rem');
   /** Ctrl/⌘ + key toggles the sidebar. `null` disables. */
   keyboardShortcut = input<string | null>('b');
-  /** Below this viewport width (px) the sidebar becomes an off-canvas overlay with backdrop. */
-  breakpoint = input<number | null, unknown>(null, {
+  /**
+   * Below this viewport width (px) the sidebar switches to its `mobile` behavior
+   * (by default an off-canvas overlay with backdrop). Defaults to `provideNgbSidebarConfig()`.
+   */
+  breakpoint = input<number | null, unknown>(this.config.breakpoint ?? null, {
     transform: (v: unknown) =>
       v === null || v === undefined || v === '' ? null : numberAttribute(v),
   });
+  /** Behavior below `breakpoint`; merged over the app config and the built-in defaults. */
+  mobile = input<Partial<NgbSidebarMobileOptions>>({});
   /** Persist the open state in localStorage under this key. */
   stateKey = input<string | null>(null);
   ariaLabel = input<string>('Sidebar');
@@ -115,15 +128,27 @@ export class NgbSidebarComponent implements OnInit {
   readonly isMobile = signal(false);
   readonly hovering = signal(false);
 
-  readonly effectiveCollapsible = computed<SidebarCollapsible>(() =>
-    this.isMobile() ? 'offcanvas' : this.collapsible(),
+  /** Resolved mobile behavior: built-in defaults < app config < `mobile` input. */
+  readonly mobileOptions = computed<NgbSidebarMobileOptions>(() => ({
+    ...NGB_SIDEBAR_MOBILE_DEFAULTS,
+    ...this.config.mobile,
+    ...this.mobile(),
+  }));
+  private readonly m = computed(() => (this.isMobile() ? this.mobileOptions() : null));
+
+  readonly effectiveCollapsible = computed<SidebarCollapsible>(
+    () => this.m()?.collapsible ?? this.collapsible(),
   );
-  readonly effectiveOverlay = computed(() => this.isMobile() || this.overlay());
+  readonly effectiveOverlay = computed(() => this.m()?.overlay ?? this.overlay());
+  readonly effectiveVariant = computed<SidebarVariant>(() => this.m()?.variant ?? this.variant());
+  readonly effectiveSide = computed<SidebarSide>(() => this.m()?.side ?? this.side());
+  readonly effectiveWidth = computed(() => this.m()?.width ?? this.width());
+  readonly effectiveOpenOnHover = computed(() => this.m()?.openOnHover ?? this.openOnHover());
   readonly expanded = computed(
     () =>
       this.effectiveCollapsible() === 'none' ||
       this.open() ||
-      (this.openOnHover() && !this.isMobile() && this.hovering()),
+      (this.effectiveOpenOnHover() && this.hovering()),
   );
   readonly state = computed<SidebarState>(() => (this.expanded() ? 'expanded' : 'collapsed'));
   /** Collapsed down to the icon rail. */
@@ -138,10 +163,11 @@ export class NgbSidebarComponent implements OnInit {
   readonly floatingPanel = computed(() => this.expanded() && !this.pushing());
   /** Bootstrap classes of the panel, derived from variant, side and state. */
   readonly panelClasses = computed(() => {
-    const variant = this.variant();
+    const variant = this.effectiveVariant();
     const cls = ['ngb-sidebar-panel', 'd-flex', 'flex-column', 'w-100'];
     if (variant !== 'inset' || this.floatingPanel()) cls.push(this.panelClass());
-    if (variant === 'sidebar') cls.push(this.side() === 'left' ? 'border-end' : 'border-start');
+    if (variant === 'sidebar')
+      cls.push(this.effectiveSide() === 'left' ? 'border-end' : 'border-start');
     if (variant === 'floating') cls.push('border', 'rounded-3', 'shadow-sm');
     if (variant === 'inset' && this.floatingPanel()) cls.push('rounded-3');
     if (this.floatingPanel()) cls.push('shadow-lg');
@@ -153,13 +179,15 @@ export class NgbSidebarComponent implements OnInit {
       this.effectiveOverlay() &&
       this.open() &&
       this.effectiveCollapsible() !== 'none' &&
-      (this.backdrop() || this.isMobile()),
+      (this.m()?.backdrop ?? this.backdrop()),
   );
 
   /** Inside a layout the layout renders the backdrop. */
   protected readonly inLayout = !!this.layout;
 
   private hoverTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Desktop open state, restored when leaving mobile view. */
+  private desktopOpen: boolean | null = null;
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -188,9 +216,16 @@ export class NgbSidebarComponent implements OnInit {
       }
       const mql = matchMedia(`(max-width: ${bp - 0.02}px)`);
       const apply = (mobile: boolean) => {
-        const changed = mobile !== this.isMobile();
-        this.isMobile.set(mobile);
-        if (changed) this.open.set(!mobile && this.readStoredState(true));
+        if (mobile === this.isMobile()) return;
+        if (mobile) {
+          this.desktopOpen = this.open();
+          this.isMobile.set(true);
+          this.open.set(this.mobileOptions().defaultOpen);
+        } else {
+          this.isMobile.set(false);
+          this.open.set(this.desktopOpen ?? this.readStoredState(true));
+          this.desktopOpen = null;
+        }
       };
       apply(mql.matches);
       const listener = (e: MediaQueryListEvent) => apply(e.matches);
@@ -244,6 +279,11 @@ export class NgbSidebarComponent implements OnInit {
     this.open.set(false);
   }
 
+  /** Called by menu buttons after navigating: collapses on mobile when `closeOnNavigate`. */
+  notifyNavigate(): void {
+    if (this.isMobile() && this.mobileOptions().closeOnNavigate) this.collapse();
+  }
+
   /** Close when used as a dismissable overlay (backdrop click, Escape). */
   dismiss(): void {
     if (this.dismissable() && this.effectiveOverlay()) this.collapse();
@@ -254,7 +294,7 @@ export class NgbSidebarComponent implements OnInit {
       clearTimeout(this.hoverTimer);
       this.hoverTimer = null;
     }
-    if (this.openOnHover()) this.hovering.set(true);
+    if (this.effectiveOpenOnHover()) this.hovering.set(true);
   }
 
   onPointerLeave(): void {

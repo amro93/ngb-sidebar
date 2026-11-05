@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import { DirectionService } from '../direction.service';
 import { NGB_SIDEBAR } from '@amro93/ngb-sidebar';
 
 export interface DemoLink {
@@ -33,6 +34,21 @@ export interface DemoLink {
               [class.bi-sun-fill]="isDarkMode()"
             ></i>
           </button>
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            (click)="direction.toggle()"
+            [title]="direction.dir() === 'rtl' ? 'Switch to LTR' : 'Switch to RTL'"
+          >
+            {{ direction.dir() === 'rtl' ? 'LTR' : 'RTL' }}
+          </button>
+          <a
+            href="https://www.npmjs.com/package/@amro93/ngb-sidebar"
+            target="_blank"
+            rel="noopener"
+            class="btn btn-outline-danger btn-sm d-none d-sm-inline-flex align-items-center gap-1"
+          >
+            <i class="bi bi-box-seam"></i> npm
+          </a>
           <a
             href="https://stackblitz.com/github/amro93/ngb-sidebar"
             target="_blank"
@@ -55,6 +71,7 @@ export interface DemoLink {
   `,
 })
 export class NavbarComponent {
+  protected readonly direction = inject(DirectionService);
   appVersion = input('');
   isDarkMode = input(false);
   themeToggle = output<void>();

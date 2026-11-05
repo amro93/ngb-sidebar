@@ -38,7 +38,7 @@ export class NgbSidebarLayoutComponent implements NgbSidebarLayoutContext {
 
   private readonly list = signal<readonly NgbSidebarComponent[]>([]);
   readonly sidebars = this.list.asReadonly();
-  readonly hasInset = computed(() => this.list().some((s) => s.variant() === 'inset'));
+  readonly hasInset = computed(() => this.list().some((s) => s.effectiveVariant() === 'inset'));
   /** Sidebars that currently request a backdrop (`backdrop` input or mobile breakpoint). */
   readonly backdropFor = computed(() => this.list().filter((s) => s.showBackdrop()));
 

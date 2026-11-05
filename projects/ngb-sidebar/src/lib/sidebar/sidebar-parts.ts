@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   Directive,
+  ElementRef,
   OnInit,
   booleanAttribute,
   computed,
@@ -182,7 +183,7 @@ export class NgbSidebarMenuItemComponent implements OnInit {
 
 @Directive()
 abstract class MenuButtonBase {
-  private readonly sidebar = inject(NgbSidebarComponent, { optional: true });
+  protected readonly sidebar = inject(NgbSidebarComponent, { optional: true });
   protected readonly item = inject(NgbSidebarMenuItemComponent, { optional: true });
 
   /** Highlight as the current page (`aria-current="page"`). */
@@ -195,8 +196,19 @@ abstract class MenuButtonBase {
     this.sidebar?.iconCollapsed() ? (this.tooltip() ?? null) : null,
   );
 
+  /** Keep the sidebar open on mobile after a click (e.g. buttons that open a dropdown). */
+  keepOpen = input(false, { transform: booleanAttribute });
+
+  private readonly el = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+
   protected onClick(): void {
-    this.item?.toggle();
+    if (this.item?.collapsible()) {
+      this.item.toggle();
+      return;
+    }
+    const opensPopup =
+      this.el.hasAttribute('data-bs-toggle') || this.el.hasAttribute('aria-haspopup');
+    if (!this.keepOpen() && !opensPopup) this.sidebar?.notifyNavigate();
   }
 }
 

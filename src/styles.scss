@@ -1,5 +1,5 @@
-/* Bootstrap 5 & Icons */
-@use 'bootstrap/scss/bootstrap';
+/* Bootstrap 5 CSS is loaded from angular.json (bootstrap-ltr / bootstrap-rtl bundles) so the demo
+   can switch direction at runtime. Icons: */
 @use 'app/app';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 

@@ -51,9 +51,9 @@
 
       <app-example-card
         anchor="responsive"
-        title="Responsive"
+        title="Responsive & Mobile Settings"
         icon="bi bi-phone"
-        description="Below the breakpoint the sidebar becomes an off-canvas overlay with backdrop."
+        description="Mobile behavior settings: below the breakpoint the sidebar adapts (off-canvas, backdrop, close on navigate, side, width). Simulate it on desktop."
         [html]="demos.responsive.html"
         [ts]="demos.responsive.ts"
       >
@@ -135,6 +135,17 @@
         [ts]="demos.drawer.ts"
       >
         <app-drawer-demo />
+      </app-example-card>
+
+      <app-example-card
+        anchor="rtl"
+        title="RTL & Arabic"
+        icon="bi bi-translate"
+        description="Right-to-left layout with Bootstrap's RTL stylesheet: the sidebar, drawer, menus and badges mirror automatically."
+        [html]="demos.rtl.html"
+        [ts]="demos.rtl.ts"
+      >
+        <app-rtl-demo />
       </app-example-card>
 
       <div id="api-reference">

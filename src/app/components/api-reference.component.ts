@@ -235,8 +235,19 @@ export class ApiReferenceComponent {
     {
       name: 'breakpoint',
       type: 'number | null',
-      def: 'null',
-      desc: 'Below this viewport width (px) become an off-canvas overlay with backdrop, closed by default.',
+      def: 'null (or app config)',
+      desc: 'Below this viewport width (px) the mobile settings apply.',
+    },
+    {
+      name: 'mobile',
+      type: 'Partial<NgbSidebarMobileOptions>',
+      def: '{}',
+      desc: "Mobile behavior: collapsible ('offcanvas'), overlay (true), backdrop (true), defaultOpen (false), closeOnNavigate (true), openOnHover (false), side, variant ('sidebar'), width ('18rem').",
+    },
+    {
+      name: 'provideNgbSidebarConfig()',
+      type: 'provider',
+      desc: 'App-wide defaults: { breakpoint, mobile }. Inputs override them.',
     },
     {
       name: 'keyboardShortcut',
@@ -317,7 +328,7 @@ export class ApiReferenceComponent {
     {
       name: '[ngbSidebarMenuButton]',
       type: 'directive',
-      desc: '[isActive], [tooltip] (title in icon mode), size sm|md|lg. Toggles a collapsible parent item.',
+      desc: '[isActive], [tooltip] (title in icon mode), size sm|md|lg, keepOpen. Toggles a collapsible parent item, otherwise closes the sidebar on mobile (closeOnNavigate).',
     },
     {
       name: '[ngbSidebarMenuSubButton]',

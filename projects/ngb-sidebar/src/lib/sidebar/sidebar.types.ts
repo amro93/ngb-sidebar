@@ -61,6 +61,36 @@ export interface NgbSidebarMenuItem {
   data?: unknown;
 }
 
+/** How the sidebar behaves below its `breakpoint` (mobile view). */
+export interface NgbSidebarMobileOptions {
+  /** Collapse mode on mobile. Default `'offcanvas'`. */
+  collapsible: SidebarCollapsible;
+  /** Float over the content instead of pushing it. Default `true`. */
+  overlay: boolean;
+  /** Show a backdrop while open. Default `true`. */
+  backdrop: boolean;
+  /** Open state when entering mobile view. Default `false`. */
+  defaultOpen: boolean;
+  /** Collapse after a (non-collapsible) menu item is clicked. Default `true`. */
+  closeOnNavigate: boolean;
+  /** Hover-to-open on mobile (touch screens have no hover). Default `false`. */
+  openOnHover: boolean;
+  /** Side override; `null` keeps the desktop side. Default `null`. */
+  side: SidebarSide | null;
+  /** Variant override; `null` keeps the desktop variant. Default `'sidebar'`. */
+  variant: SidebarVariant | null;
+  /** Width override, e.g. `'85vw'`; `null` keeps the desktop width. Default `'18rem'`. */
+  width: string | null;
+}
+
+/** App-wide defaults, provided with `provideNgbSidebarConfig()`. */
+export interface NgbSidebarConfig {
+  /** Default `breakpoint` (px) for every sidebar; `null` disables mobile mode. */
+  breakpoint: number | null;
+  /** Default mobile behavior for every sidebar. */
+  mobile: Partial<NgbSidebarMobileOptions>;
+}
+
 export interface SidebarItemClickEvent {
   originalEvent: Event;
   item: NgbSidebarMenuItem;
