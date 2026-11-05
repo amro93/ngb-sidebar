@@ -195,22 +195,3 @@
 .ngb-sidebar-menu-button[data-size='lg'] > .demo-avatar {
   margin-left: -0.25rem;
 }
-
-// Theming examples
-.demo-theme-dark {
-  --ngb-sidebar-bg: #111827;
-  --ngb-sidebar-color: #e5e7eb;
-  --ngb-sidebar-muted: #9ca3af;
-  --ngb-sidebar-border-color: #1f2937;
-  --ngb-sidebar-hover-bg: #1f2937;
-  --ngb-sidebar-active-bg: #374151;
-  --ngb-sidebar-active-color: #fff;
-}
-.demo-theme-indigo {
-  --ngb-sidebar-bg: #eef2ff;
-  --ngb-sidebar-color: #1e1b4b;
-  --ngb-sidebar-active-bg: #4f46e5;
-  --ngb-sidebar-active-color: #fff;
-  --ngb-sidebar-hover-bg: #e0e7ff;
-  --ngb-sidebar-radius: 999px;
-}

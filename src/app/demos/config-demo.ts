@@ -18,12 +18,22 @@ const HTML = `
     </select>
   </div>
   <div>
-    <label class="form-label fw-semibold mb-1" for="c-theme">Theme (CSS variables)</label>
-    <select id="c-theme" class="form-select form-select-sm" [value]="theme()"
-            (change)="theme.set($any($event.target).value)">
-      <option value="">Default (Bootstrap)</option>
-      <option value="demo-theme-dark">Dark</option>
-      <option value="demo-theme-indigo">Indigo</option>
+    <label class="form-label fw-semibold mb-1" for="c-theme">theme (data-bs-theme)</label>
+    <select id="c-theme" class="form-select form-select-sm" [value]="theme() ?? ''"
+            (change)="theme.set($any($event.target).value || null)">
+      <option value="">inherit</option>
+      <option value="light">light</option>
+      <option value="dark">dark</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label fw-semibold mb-1" for="c-panel">panelClass</label>
+    <select id="c-panel" class="form-select form-select-sm" [value]="panelClass()"
+            (change)="panelClass.set($any($event.target).value)">
+      <option>bg-body-tertiary</option>
+      <option>bg-body</option>
+      <option>bg-primary-subtle</option>
+      <option>bg-success-subtle</option>
     </select>
   </div>
   <div class="form-check form-switch mb-1">
@@ -38,9 +48,10 @@ const HTML = `
 </div>
 
 <div class="demo-frame">
-  <ngb-sidebar-layout [fill]="false" [class]="theme()">
+  <ngb-sidebar-layout [fill]="false">
     <ngb-sidebar id="config-demo" variant="floating" collapsible="icon" overlay
                  [width]="width()" [iconWidth]="iconWidth()" [dismissable]="dismissable()"
+                 [theme]="theme()" [panelClass]="panelClass()"
                  keyboardShortcut="b" stateKey="demo-sidebar" backdrop>
       <ngb-sidebar-content class="pt-2">
         <ngb-sidebar-nav [model]="menu" />
@@ -66,30 +77,12 @@ import { NGB_SIDEBAR, NgbSidebarMenuItem } from '@amro93/ngb-sidebar';
   selector: 'app-config-demo',
   imports: [...NGB_SIDEBAR],
   templateUrl: './config-demo.html',
-  styles: [\`
-    /* Theme the sidebar with CSS variables */
-    .demo-theme-dark {
-      --ngb-sidebar-bg: #111827;
-      --ngb-sidebar-color: #e5e7eb;
-      --ngb-sidebar-muted: #9ca3af;
-      --ngb-sidebar-border-color: #1f2937;
-      --ngb-sidebar-hover-bg: #1f2937;
-      --ngb-sidebar-active-bg: #374151;
-      --ngb-sidebar-active-color: #fff;
-    }
-    .demo-theme-indigo {
-      --ngb-sidebar-bg: #eef2ff;
-      --ngb-sidebar-active-bg: #4f46e5;
-      --ngb-sidebar-active-color: #fff;
-      --ngb-sidebar-hover-bg: #e0e7ff;
-      --ngb-sidebar-radius: 999px;
-    }
-  \`],
 })
 export class ConfigDemo {
   width = signal('16rem');
   iconWidth = signal('3rem');
-  theme = signal('');
+  theme = signal<'light' | 'dark' | null>(null); // Bootstrap color mode for the sidebar only
+  panelClass = signal('bg-body-tertiary'); // any Bootstrap background utility
   dismissable = signal(true);
 
   menu: NgbSidebarMenuItem[] = [
@@ -114,7 +107,8 @@ export class ConfigDemo {
 
   width = signal('16rem');
   iconWidth = signal('3rem');
-  theme = signal('');
+  theme = signal<'light' | 'dark' | null>(null); // Bootstrap color mode for the sidebar only
+  panelClass = signal('bg-body-tertiary'); // any Bootstrap background utility
   dismissable = signal(true);
   menu: NgbSidebarMenuItem[] = [
     { label: 'Home', icon: 'bi bi-house', active: true },

@@ -17,14 +17,19 @@ import type { NgbSidebarComponent } from './sidebar.component';
   exportAs: 'ngbSidebarLayout',
   template: `<ng-content></ng-content>
     @if (backdropFor().length) {
-      <div class="ngb-sidebar-backdrop" aria-hidden="true" (click)="dismissAll()"></div>
+      <div
+        class="ngb-sidebar-backdrop offcanvas-backdrop show position-absolute top-0 start-0 w-100 h-100"
+        aria-hidden="true"
+        (click)="dismissAll()"
+      ></div>
     }`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: NGB_SIDEBAR_LAYOUT, useExisting: NgbSidebarLayoutComponent }],
   host: {
-    class: 'ngb-sidebar-layout',
+    class: 'ngb-sidebar-layout d-flex position-relative w-100',
     '[class.ngb-sidebar-layout-inset]': 'hasInset()',
-    '[class.ngb-sidebar-layout-fill]': 'fill()',
+    '[class.bg-body-tertiary]': 'hasInset()',
+    '[class.min-vh-100]': 'fill()',
   },
 })
 export class NgbSidebarLayoutComponent implements NgbSidebarLayoutContext {
@@ -56,9 +61,19 @@ export class NgbSidebarLayoutComponent implements NgbSidebarLayoutContext {
   standalone: true,
   template: '<ng-content></ng-content>',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-main', role: 'main' },
+  host: {
+    class: 'ngb-sidebar-main d-flex flex-column flex-grow-1 position-relative bg-body',
+    role: 'main',
+    '[class.m-2]': 'inset()',
+    '[class.rounded-3]': 'inset()',
+    '[class.shadow-sm]': 'inset()',
+    '[class.overflow-hidden]': 'inset()',
+  },
 })
-export class NgbSidebarMainComponent {}
+export class NgbSidebarMainComponent {
+  private readonly layout = inject(NGB_SIDEBAR_LAYOUT, { optional: true });
+  protected readonly inset = computed(() => !!this.layout?.hasInset());
+}
 
 /**
  * Backdrop shown while any overlay sidebar of the surrounding layout is open.
@@ -71,9 +86,10 @@ export class NgbSidebarMainComponent {}
   template: '',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'ngb-sidebar-backdrop ngb-sidebar-backdrop-standalone',
+    class:
+      'ngb-sidebar-backdrop offcanvas-backdrop show position-absolute top-0 start-0 w-100 h-100',
     'aria-hidden': 'true',
-    '[class.ngb-sidebar-backdrop-visible]': 'visible()',
+    '[class.d-none]': '!visible()',
     '(click)': 'dismiss()',
   },
 })

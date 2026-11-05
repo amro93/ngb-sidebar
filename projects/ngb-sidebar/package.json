@@ -1,7 +1,7 @@
 {
   "name": "@amro93/ngb-sidebar",
   "version": "0.1.0",
-  "description": "Composable Angular navigation sidebar (icon/offcanvas collapse, variants, nested menus) and overlay drawer, built with pure Bootstrap 5",
+  "description": "Composable Angular navigation sidebar (icon/offcanvas collapse, variants, nested menus) and overlay drawer, built with Bootstrap 5 classes",
   "keywords": [
     "angular",
     "angular-sidebar",
@@ -34,11 +34,6 @@
     "@angular/common": ">=20.0.0",
     "@angular/core": ">=20.0.0",
     "bootstrap": ">=5.0.0"
-  },
-  "peerDependenciesMeta": {
-    "bootstrap": {
-      "optional": true
-    }
   },
   "dependencies": {
     "tslib": "^2.3.0"

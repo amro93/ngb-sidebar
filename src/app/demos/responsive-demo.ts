@@ -33,7 +33,7 @@ const HTML = `
                     <i [class]="item.icon"></i><span>{{ item.label }}</span>
                   </button>
                   @if (item.badge) {
-                    <ngb-sidebar-menu-badge class="text-bg-danger">{{ item.badge }}</ngb-sidebar-menu-badge>
+                    <ngb-sidebar-menu-badge badgeClass="text-bg-danger">{{ item.badge }}</ngb-sidebar-menu-badge>
                   }
                 </ngb-sidebar-menu-item>
               }

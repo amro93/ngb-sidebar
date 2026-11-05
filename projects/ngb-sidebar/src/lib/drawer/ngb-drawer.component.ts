@@ -39,12 +39,21 @@ let zIndexCounter = 0;
 /** Open sidebars that block body scroll (scroll is restored when the last one closes). */
 let scrollLocks = 0;
 
+/** Bootstrap offcanvas placement class for each position (`full` slides up full height). */
+const OFFCANVAS_POSITION: Record<DrawerPosition, string> = {
+  left: 'offcanvas-start',
+  right: 'offcanvas-end',
+  top: 'offcanvas-top',
+  bottom: 'offcanvas-bottom',
+  full: 'offcanvas-bottom',
+};
+
 const FOCUSABLE =
   'a[href],area[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),' +
   'select:not([disabled]),textarea:not([disabled]),iframe,[tabindex]:not([tabindex="-1"]),[contenteditable="true"]';
 
 /**
- * Bootstrap 5 styled sidebar / drawer panel that slides in from any viewport edge.
+ * Overlay panel built on Bootstrap 5's `.offcanvas` that slides in from any viewport edge.
  *
  * ```html
  * <ngb-drawer [(visible)]="open" position="right" header="Settings">...</ngb-drawer>
@@ -55,7 +64,6 @@ const FOCUSABLE =
   standalone: true,
   imports: [NgClass, NgStyle, NgTemplateOutlet],
   templateUrl: './ngb-drawer.component.html',
-  styleUrls: ['./ngb-drawer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgbDrawerComponent implements OnDestroy {
@@ -141,23 +149,34 @@ export class NgbDrawerComponent implements OnDestroy {
     () => this.ariaLabelledBy() ?? (this.header() || this.headerTpl() ? this.headerId : null),
   );
 
+  /** Bootstrap offcanvas classes (plus `ngb-drawer-*` hooks for tests and custom styling). */
   readonly panelClasses = computed(() => {
+    const pos = this.effectivePosition();
     const cls: Record<string, boolean> = {
-      [`ngb-drawer-${this.effectivePosition()}`]: true,
+      [OFFCANVAS_POSITION[pos]]: true,
+      [`ngb-drawer-${pos}`]: true,
+      show: this.active(),
       'ngb-drawer-active': this.active(),
     };
     if (this.styleClass()) cls[this.styleClass()] = true;
     return cls;
   });
 
+  /** Sizes and timing go through Bootstrap's own offcanvas CSS variables. */
   readonly panelStyle = computed(() => {
-    const s: Record<string, any> = { ...(this.style() ?? {}) };
+    const s: Record<string, any> = {
+      '--bs-offcanvas-transition': `transform ${this.transitionDuration()}ms ease-in-out`,
+    };
     const size = this.size();
     const pos = this.effectivePosition();
-    if (size && (pos === 'left' || pos === 'right')) s['width'] ??= size;
-    if (size && (pos === 'top' || pos === 'bottom')) s['height'] ??= size;
-    s['transition-duration'] = `${this.transitionDuration()}ms`;
-    return s;
+    if (pos === 'full') {
+      s['--bs-offcanvas-height'] = '100vh';
+    } else if (size && (pos === 'left' || pos === 'right')) {
+      s['--bs-offcanvas-width'] = size;
+    } else if (size) {
+      s['--bs-offcanvas-height'] = size;
+    }
+    return { ...s, ...(this.style() ?? {}) };
   });
 
   readonly tplContext: DrawerTemplateContext = {

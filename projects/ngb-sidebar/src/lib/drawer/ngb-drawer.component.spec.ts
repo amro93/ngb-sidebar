@@ -118,6 +118,14 @@ describe('NgbDrawerComponent', () => {
     const p = panel()!;
     expect(p.classList).toContain('ngb-drawer-left');
     expect(p.classList).toContain('ngb-drawer-active');
+    // Bootstrap offcanvas classes
+    expect(p.classList).toContain('offcanvas');
+    expect(p.classList).toContain('offcanvas-start');
+    expect(p.classList).toContain('show');
+    expect(p.querySelector('.offcanvas-header')).not.toBeNull();
+    expect(p.querySelector('.offcanvas-body')).not.toBeNull();
+    expect(p.querySelector('.btn-close')).not.toBeNull();
+    expect(mask()!.classList).toContain('offcanvas-backdrop');
     expect(p.classList).toContain('my-panel');
     expect(p.getAttribute('role')).toBe('dialog');
     expect(p.getAttribute('aria-modal')).toBe('true');
@@ -159,12 +167,12 @@ describe('NgbDrawerComponent', () => {
   it('applies size as width for left/right and height for top/bottom', async () => {
     host.size.set('30rem');
     await open();
-    expect(panel()!.style.width).toBe('30rem');
+    expect(panel()!.style.getPropertyValue('--bs-offcanvas-width')).toBe('30rem');
     host.visible.set(false);
     await settle();
     host.position.set('top');
     await open();
-    expect(panel()!.style.height).toBe('30rem');
+    expect(panel()!.style.getPropertyValue('--bs-offcanvas-height')).toBe('30rem');
   });
 
   it('blockScroll locks body overflow', async () => {

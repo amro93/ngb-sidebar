@@ -71,7 +71,7 @@ export class NavbarComponent {
         <div class="col-md-7 text-center text-md-start">
           <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center justify-content-md-start">
             <span class="badge bg-white text-primary badge-feature"
-              ><i class="bi bi-bootstrap-fill me-1"></i> Pure Bootstrap 5</span
+              ><i class="bi bi-bootstrap-fill me-1"></i> Bootstrap 5 classes</span
             >
             <span class="badge bg-white text-primary badge-feature"
               ><i class="bi bi-diagram-3 me-1"></i> Nested menus</span
@@ -86,9 +86,10 @@ export class NavbarComponent {
           <h1 class="display-5 fw-bold mb-3">Angular Sidebar Component</h1>
           <p class="lead opacity-90 mb-4">
             A composable navigation sidebar with icon &amp; off-canvas collapse, floating and inset
-            variants, hover-to-open, responsive overlay, unlimited sub-menus and an overlay drawer —
-            styled with
-            <strong>pure Bootstrap 5</strong>. No other UI library needed.
+            variants, hover-to-open, responsive overlay, unlimited sub-menus and an offcanvas drawer
+            — built from
+            <strong>Bootstrap 5 classes</strong> (nav pills, offcanvas, badges, utilities). No other
+            UI library needed.
           </p>
           <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
             <a href="#examples" class="btn btn-light btn-lg fw-semibold text-primary shadow-sm">

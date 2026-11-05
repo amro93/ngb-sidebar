@@ -34,6 +34,8 @@ export class NgbSidebarRegistry {
 /** Shared state of a `<ngb-sidebar-layout>`, injected by its sidebars, triggers and backdrop. */
 export interface NgbSidebarLayoutContext {
   readonly sidebars: () => readonly NgbSidebarComponent[];
+  /** True when a sidebar of the layout uses the `inset` variant. */
+  readonly hasInset: () => boolean;
   add(s: NgbSidebarComponent): void;
   remove(s: NgbSidebarComponent): void;
 }

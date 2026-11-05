@@ -1,17 +1,22 @@
 @if (showBackdrop() && !inLayout) {
-  <div class="ngb-sidebar-backdrop" aria-hidden="true" (click)="dismiss()"></div>
+  <div
+    class="ngb-sidebar-backdrop offcanvas-backdrop show"
+    aria-hidden="true"
+    (click)="dismiss()"
+  ></div>
 }
 <div class="ngb-sidebar-spacer"></div>
 <aside
   class="ngb-sidebar-aside"
   [attr.aria-label]="ariaLabel()"
+  [attr.data-bs-theme]="theme()"
   [attr.inert]="!expanded() && effectiveCollapsible() === 'offcanvas' ? '' : null"
   (mouseenter)="onPointerEnter()"
   (mouseleave)="onPointerLeave()"
   (focusin)="onPointerEnter()"
   (focusout)="onFocusOut($event)"
 >
-  <div class="ngb-sidebar-panel">
+  <div [class]="panelClasses()">
     <ng-content></ng-content>
   </div>
 </aside>

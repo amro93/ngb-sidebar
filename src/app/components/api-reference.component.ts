@@ -81,11 +81,13 @@ type Tab = 'sidebar' | 'parts' | 'nav' | 'model' | 'css' | 'drawer' | 'a11y';
             }
             @case ('css') {
               <div class="p-3 small text-body-secondary">
-                Set these on <code>ngb-sidebar-layout</code> (or any ancestor / <code>:root</code>).
-                Defaults use Bootstrap 5.3 tokens, so dark mode (<code>data-bs-theme="dark"</code>)
-                works out of the box. The <code>.ngb-sidebar-hide-collapsed</code> class hides any
-                element while collapsed to icons, <code>.ngb-sidebar-rotate</code> rotates a custom
-                chevron when its item opens.
+                Everything visual is a Bootstrap class: menus are <code>nav nav-pills</code>, badges
+                <code>badge</code>, actions <code>btn</code>, the drawer and backdrops
+                <code>offcanvas</code>. Theme it the Bootstrap way below. Custom CSS only covers the
+                collapse mechanics, rail, chevron and hover actions. The
+                <code>.ngb-sidebar-hide-collapsed</code> class hides any element while collapsed to
+                icons, <code>.ngb-sidebar-rotate</code> rotates a custom chevron when its item
+                opens.
               </div>
               <ng-container *ngTemplateOutlet="table; context: { $implicit: cssVars }" />
             }
@@ -157,7 +159,7 @@ export class ApiReferenceComponent {
     { id: 'parts', label: 'Building blocks', icon: 'bi bi-boxes' },
     { id: 'nav', label: 'ngb-sidebar-nav', icon: 'bi bi-diagram-3' },
     { id: 'model', label: 'Menu item model', icon: 'bi bi-braces' },
-    { id: 'css', label: 'Theming', icon: 'bi bi-palette' },
+    { id: 'css', label: 'Theming (Bootstrap)', icon: 'bi bi-palette' },
     { id: 'drawer', label: 'ngb-drawer', icon: 'bi bi-window-sidebar' },
     { id: 'a11y', label: 'Accessibility', icon: 'bi bi-universal-access' },
   ];
@@ -253,6 +255,18 @@ export class ApiReferenceComponent {
       type: 'string',
       def: "'Sidebar'",
       desc: 'Accessible name of the <aside> landmark.',
+    },
+    {
+      name: 'panelClass',
+      type: 'string',
+      def: "'bg-body-tertiary'",
+      desc: 'Bootstrap background/text classes of the panel.',
+    },
+    {
+      name: 'theme',
+      type: "'light' | 'dark' | null",
+      def: 'null',
+      desc: 'Bootstrap color mode for the sidebar only (data-bs-theme).',
     },
   ];
 
@@ -421,56 +435,53 @@ export class ApiReferenceComponent {
   ];
 
   cssVars: Row[] = [
-    { name: '--ngb-sidebar-bg', type: 'color', def: '--bs-tertiary-bg', desc: 'Panel background.' },
-    { name: '--ngb-sidebar-color', type: 'color', def: '--bs-body-color', desc: 'Text color.' },
     {
-      name: '--ngb-sidebar-muted',
-      type: 'color',
-      def: '--bs-secondary-color',
-      desc: 'Group labels, sub items.',
+      name: 'theme',
+      type: "input: 'light' | 'dark'",
+      def: 'null',
+      desc: 'Sets data-bs-theme on the sidebar: Bootstrap 5.3 color mode for the sidebar only.',
     },
     {
-      name: '--ngb-sidebar-border-color',
-      type: 'color',
-      def: '--bs-border-color',
-      desc: 'Borders and separators.',
+      name: 'panelClass',
+      type: 'input: string',
+      def: 'bg-body-tertiary',
+      desc: 'Any Bootstrap background/text utility for the panel (bg-body, bg-primary-subtle, …).',
     },
     {
-      name: '--ngb-sidebar-hover-bg',
-      type: 'color',
-      def: '--bs-secondary-bg',
-      desc: 'Hovered button.',
+      name: 'badgeClass',
+      type: 'input on ngb-sidebar-menu-badge',
+      def: 'bg-secondary-subtle text-secondary-emphasis',
+      desc: 'Badge colors, e.g. text-bg-danger.',
     },
     {
-      name: '--ngb-sidebar-active-bg',
-      type: 'color',
-      def: '--bs-primary-bg-subtle',
-      desc: 'Active button.',
+      name: '--bs-nav-pills-link-active-bg / -color',
+      type: 'Bootstrap CSS variable',
+      def: 'primary',
+      desc: 'Active item colors (menus are Bootstrap nav pills).',
     },
     {
-      name: '--ngb-sidebar-active-color',
-      type: 'color',
-      def: '--bs-primary-text-emphasis',
-      desc: 'Active text.',
+      name: '--bs-offcanvas-width / -height',
+      type: 'Bootstrap CSS variable',
+      def: '400px / 30vh',
+      desc: 'Drawer size (the size input sets these).',
     },
     {
-      name: '--ngb-sidebar-radius',
+      name: '--ngb-sidebar-width / -width-icon',
       type: 'length',
-      def: '--bs-border-radius',
-      desc: 'Button radius.',
+      def: '16rem / 3rem',
+      desc: 'Set through the width / iconWidth inputs.',
     },
     {
       name: '--ngb-sidebar-transition',
       type: 'transition',
-      def: '200ms ease',
+      def: '200ms',
       desc: 'Collapse animation.',
     },
-    { name: '--ngb-sidebar-z', type: 'number', def: '1020', desc: 'Base z-index.' },
     {
-      name: '--ngb-sidebar-backdrop',
-      type: 'color',
-      def: 'rgba(0,0,0,.45)',
-      desc: 'Backdrop color.',
+      name: '--ngb-sidebar-z',
+      type: 'number',
+      def: '1030',
+      desc: 'Base z-index inside the layout.',
     },
   ];
 

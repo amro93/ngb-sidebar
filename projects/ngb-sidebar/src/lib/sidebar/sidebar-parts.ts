@@ -21,7 +21,7 @@ const SLOT = '<ng-content></ng-content>';
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-header' },
+  host: { class: 'ngb-sidebar-header d-flex flex-column flex-shrink-0 gap-2 p-2' },
 })
 export class NgbSidebarHeaderComponent {}
 
@@ -31,7 +31,10 @@ export class NgbSidebarHeaderComponent {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-content' },
+  host: {
+    class:
+      'ngb-sidebar-content d-flex flex-column flex-grow-1 gap-2 overflow-x-hidden overflow-y-auto',
+  },
 })
 export class NgbSidebarContentComponent {}
 
@@ -41,7 +44,7 @@ export class NgbSidebarContentComponent {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-footer' },
+  host: { class: 'ngb-sidebar-footer d-flex flex-column flex-shrink-0 gap-2 p-2' },
 })
 export class NgbSidebarFooterComponent {}
 
@@ -51,7 +54,7 @@ export class NgbSidebarFooterComponent {}
   standalone: true,
   template: '',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-separator', role: 'separator' },
+  host: { class: 'ngb-sidebar-separator d-block border-top mx-2 my-1', role: 'separator' },
 })
 export class NgbSidebarSeparatorComponent {}
 
@@ -62,7 +65,7 @@ export class NgbSidebarSeparatorComponent {}
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'ngb-sidebar-group',
+    class: 'ngb-sidebar-group d-flex flex-column position-relative px-2',
     role: 'group',
     '[attr.data-collapsible]': 'collapsible() || null',
     '[attr.data-open]': 'open()',
@@ -85,7 +88,8 @@ export class NgbSidebarGroupComponent {
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'ngb-sidebar-group-label',
+    class:
+      'ngb-sidebar-group-label d-flex align-items-center gap-2 px-2 rounded small fw-semibold text-body-secondary text-nowrap overflow-hidden',
     '[attr.role]': 'group?.collapsible() ? "button" : null',
     '[attr.tabindex]': 'group?.collapsible() ? 0 : null',
     '[attr.aria-expanded]': 'group?.collapsible() ? group!.open() : null',
@@ -102,7 +106,10 @@ export class NgbSidebarGroupLabelComponent {
 @Directive({
   selector: '[ngbSidebarGroupAction]',
   standalone: true,
-  host: { class: 'ngb-sidebar-group-action' },
+  host: {
+    class:
+      'ngb-sidebar-group-action btn btn-sm btn-link link-secondary p-0 position-absolute top-0 end-0 mt-1 me-3',
+  },
 })
 export class NgbSidebarGroupActionDirective {}
 
@@ -112,7 +119,7 @@ export class NgbSidebarGroupActionDirective {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-group-content' },
+  host: { class: 'ngb-sidebar-group-content d-block w-100' },
 })
 export class NgbSidebarGroupContentComponent {}
 
@@ -122,7 +129,7 @@ export class NgbSidebarGroupContentComponent {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-menu', role: 'list' },
+  host: { class: 'ngb-sidebar-menu nav nav-pills flex-column flex-nowrap gap-1', role: 'list' },
 })
 export class NgbSidebarMenuComponent {}
 
@@ -132,7 +139,11 @@ export class NgbSidebarMenuComponent {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-menu-sub', role: 'list' },
+  host: {
+    class:
+      'ngb-sidebar-menu-sub nav nav-pills flex-column flex-nowrap gap-1 border-start ms-3 ps-2 my-1',
+    role: 'list',
+  },
 })
 export class NgbSidebarMenuSubComponent {}
 
@@ -146,7 +157,7 @@ export class NgbSidebarMenuSubComponent {}
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'ngb-sidebar-menu-item',
+    class: 'ngb-sidebar-menu-item nav-item d-block position-relative',
     role: 'listitem',
     '[attr.data-collapsible]': 'collapsible() || null',
     '[attr.data-open]': 'collapsible() ? open() : null',
@@ -194,7 +205,12 @@ abstract class MenuButtonBase {
   selector: '[ngbSidebarMenuButton]',
   standalone: true,
   host: {
-    class: 'ngb-sidebar-menu-button',
+    class: 'ngb-sidebar-menu-button nav-link d-flex align-items-center gap-2 w-100 px-2 text-start',
+    '[class.active]': 'isActive()',
+    '[class.link-body-emphasis]': '!isActive()',
+    '[class.py-1]': 'size() === "sm"',
+    '[class.small]': 'size() === "sm"',
+    '[class.py-2]': 'size() === "lg"',
     '[attr.data-active]': 'isActive() || null',
     '[attr.data-size]': 'size()',
     '[attr.aria-current]': 'isActive() ? "page" : null',
@@ -210,7 +226,10 @@ export class NgbSidebarMenuButtonDirective extends MenuButtonBase {}
   selector: '[ngbSidebarMenuSubButton]',
   standalone: true,
   host: {
-    class: 'ngb-sidebar-menu-sub-button',
+    class:
+      'ngb-sidebar-menu-sub-button nav-link d-flex align-items-center gap-2 w-100 px-2 py-1 small text-start',
+    '[class.active]': 'isActive()',
+    '[class.link-secondary]': '!isActive()',
     '[attr.data-active]': 'isActive() || null',
     '[attr.data-size]': 'size()',
     '[attr.aria-current]': 'isActive() ? "page" : null',
@@ -226,16 +245,24 @@ export class NgbSidebarMenuSubButtonDirective extends MenuButtonBase {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-menu-badge' },
+  host: {
+    class:
+      'ngb-sidebar-menu-badge badge rounded-pill position-absolute top-50 end-0 translate-middle-y me-2',
+    '[class]': 'badgeClass()',
+  },
 })
-export class NgbSidebarMenuBadgeComponent {}
+export class NgbSidebarMenuBadgeComponent {
+  /** Bootstrap color classes, e.g. `text-bg-danger`. */
+  badgeClass = input<string>('bg-secondary-subtle text-secondary-emphasis');
+}
 
 /** Secondary icon button on a menu item (e.g. "more" menu). */
 @Directive({
   selector: '[ngbSidebarMenuAction]',
   standalone: true,
   host: {
-    class: 'ngb-sidebar-menu-action',
+    class:
+      'ngb-sidebar-menu-action btn btn-sm btn-link link-body-emphasis p-0 position-absolute top-50 end-0 translate-middle-y me-1',
     '[attr.data-show-on-hover]': 'showOnHover() || null',
   },
 })

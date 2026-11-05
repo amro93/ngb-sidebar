@@ -2,8 +2,8 @@
   <div #root class="ngb-drawer-root">
     @if (modal()) {
       <div
-        class="ngb-drawer-mask"
-        [class.ngb-drawer-mask-active]="active()"
+        class="ngb-drawer-mask offcanvas-backdrop fade"
+        [class.show]="active()"
         [ngClass]="maskStyleClass()"
         [style.z-index]="maskZIndex()"
         [style.transition-duration.ms]="transitionDuration()"
@@ -12,7 +12,7 @@
     }
     <div
       #container
-      class="ngb-drawer"
+      class="ngb-drawer offcanvas"
       [id]="id"
       [ngClass]="panelClasses()"
       [ngStyle]="panelStyle()"
@@ -26,8 +26,8 @@
       @if (headlessTpl(); as headless) {
         <ng-container *ngTemplateOutlet="headless.templateRef; context: tplContext"></ng-container>
       } @else {
-        <div class="ngb-drawer-header">
-          <div class="ngb-drawer-title" [id]="headerId">
+        <div class="ngb-drawer-header offcanvas-header gap-2">
+          <div class="ngb-drawer-title offcanvas-title flex-grow-1" [id]="headerId">
             @if (headerTpl(); as h) {
               <ng-container *ngTemplateOutlet="h.templateRef; context: tplContext"></ng-container>
             } @else if (header()) {
@@ -35,32 +35,39 @@
             }
           </div>
           @if (showCloseIcon() && closable()) {
-            <button
-              type="button"
-              class="ngb-drawer-close"
-              [attr.aria-label]="ariaCloseLabel()"
-              (click)="close('close-button')"
-            >
-              @if (closeIconTpl(); as ci) {
-                <ng-container
-                  *ngTemplateOutlet="ci.templateRef; context: tplContext"
-                ></ng-container>
-              } @else if (closeIcon()) {
-                <i [class]="closeIcon()" aria-hidden="true"></i>
-              } @else {
-                <span class="btn-close" aria-hidden="true"></span>
-              }
-            </button>
+            @if (closeIconTpl() || closeIcon()) {
+              <button
+                type="button"
+                class="ngb-drawer-close btn btn-sm btn-link link-body-emphasis"
+                [attr.aria-label]="ariaCloseLabel()"
+                (click)="close('close-button')"
+              >
+                @if (closeIconTpl(); as ci) {
+                  <ng-container
+                    *ngTemplateOutlet="ci.templateRef; context: tplContext"
+                  ></ng-container>
+                } @else {
+                  <i [class]="closeIcon()" aria-hidden="true"></i>
+                }
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="ngb-drawer-close btn-close"
+                [attr.aria-label]="ariaCloseLabel()"
+                (click)="close('close-button')"
+              ></button>
+            }
           }
         </div>
-        <div class="ngb-drawer-content">
+        <div class="ngb-drawer-content offcanvas-body">
           <ng-content></ng-content>
           @if (contentTpl(); as c) {
             <ng-container *ngTemplateOutlet="c.templateRef; context: tplContext"></ng-container>
           }
         </div>
         @if (footerTpl(); as f) {
-          <div class="ngb-drawer-footer">
+          <div class="ngb-drawer-footer p-3 border-top">
             <ng-container *ngTemplateOutlet="f.templateRef; context: tplContext"></ng-container>
           </div>
         }

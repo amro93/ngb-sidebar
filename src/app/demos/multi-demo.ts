@@ -55,7 +55,7 @@ const HTML = `
                       <span>{{ link }}</span>
                     </button>
                     @if (link === 'Vault') {
-                      <ngb-sidebar-menu-badge class="text-bg-warning">BETA</ngb-sidebar-menu-badge>
+                      <ngb-sidebar-menu-badge badgeClass="text-bg-warning">BETA</ngb-sidebar-menu-badge>
                     }
                   </ngb-sidebar-menu-item>
                 }

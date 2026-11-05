@@ -101,6 +101,13 @@ export class NgbSidebarComponent implements OnInit {
   /** Persist the open state in localStorage under this key. */
   stateKey = input<string | null>(null);
   ariaLabel = input<string>('Sidebar');
+  /**
+   * Bootstrap classes for the panel background/text, e.g. `bg-body-tertiary` (default),
+   * `bg-body`, `bg-primary-subtle`, `text-bg-dark`.
+   */
+  panelClass = input<string>('bg-body-tertiary');
+  /** Bootstrap 5.3 color mode for the sidebar only (`data-bs-theme`), e.g. `'dark'`. */
+  theme = input<'light' | 'dark' | null>(null);
   /** Delay (ms) before a hover-opened sidebar collapses after the pointer leaves. */
   hoverCloseDelay = input(150, { transform: numberAttribute });
 
@@ -129,6 +136,18 @@ export class NgbSidebarComponent implements OnInit {
   );
   /** Expanded over the content (overlay or hover) – gets elevated with a shadow. */
   readonly floatingPanel = computed(() => this.expanded() && !this.pushing());
+  /** Bootstrap classes of the panel, derived from variant, side and state. */
+  readonly panelClasses = computed(() => {
+    const variant = this.variant();
+    const cls = ['ngb-sidebar-panel', 'd-flex', 'flex-column', 'w-100'];
+    if (variant !== 'inset' || this.floatingPanel()) cls.push(this.panelClass());
+    if (variant === 'sidebar') cls.push(this.side() === 'left' ? 'border-end' : 'border-start');
+    if (variant === 'floating') cls.push('border', 'rounded-3', 'shadow-sm');
+    if (variant === 'inset' && this.floatingPanel()) cls.push('rounded-3');
+    if (this.floatingPanel()) cls.push('shadow-lg');
+    return cls.join(' ');
+  });
+
   readonly showBackdrop = computed(
     () =>
       this.effectiveOverlay() &&

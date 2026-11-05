@@ -1,7 +1,8 @@
 # @amro93/ngb-sidebar
 
-Composable, accessible Angular **navigation sidebar** — plus an overlay **drawer** — styled with pure
-Bootstrap 5. Standalone, signal-based, zero runtime dependencies besides Angular.
+Composable, accessible Angular **navigation sidebar** — plus an overlay **drawer** — built from Bootstrap 5
+classes (`nav-pills`, `offcanvas`, `badge`, utilities) with a small stylesheet only for the collapse mechanics
+Bootstrap doesn't have. Standalone, signal-based, no runtime dependencies besides Angular.
 
 - Collapse to an **icon rail**, slide **off canvas**, or never collapse
 - **sidebar / floating / inset** variants, **left / right** side, multiple sidebars per layout
@@ -10,8 +11,8 @@ Bootstrap 5. Standalone, signal-based, zero runtime dependencies besides Angular
 - Groups (collapsible), menus, **unlimited nested sub menus**, badges, hover actions, tooltips in icon mode
 - Data-driven `<ngb-sidebar-nav [model]>` with active tracking, accordion mode and custom item template
 - Keyboard shortcut (Ctrl/⌘+B), Escape to dismiss, persisted state (`localStorage`)
-- Themable through CSS variables, Bootstrap dark mode out of the box
-- `<ngb-drawer>`: overlay panel from any edge, full screen, templates, focus trap
+- Themed the Bootstrap way: `theme="dark"` (`data-bs-theme`), `panelClass`, `badgeClass`, nav-pill variables
+- `<ngb-drawer>`: Bootstrap **offcanvas** from any edge, full screen, templates, focus trap
 
 **Demo & code examples:** https://amro93.github.io/ngb-sidebar/
 
@@ -23,7 +24,7 @@ npm install @amro93/ngb-sidebar bootstrap bootstrap-icons
 
 ```scss
 // styles.scss
-@use 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap'; // required: the components use Bootstrap classes
 @import 'bootstrap-icons/font/bootstrap-icons.css'; // optional, used in the examples
 ```
 
@@ -138,24 +139,26 @@ routerLinkActive #rla="routerLinkActive" [isActive]="rla.isActive">`, or call `r
 
 ## `<ngb-sidebar>` API
 
-| Input              | Type                                 | Default       | Description                                                            |
-| ------------------ | ------------------------------------ | ------------- | ---------------------------------------------------------------------- |
-| `id`               | `string`                             | auto          | Used by `ngbSidebarTrigger[target]`, `aria-controls` and the registry. |
-| `open`             | `model<boolean>`                     | `true`        | Two-way expanded state `[(open)]`.                                     |
-| `variant`          | `'sidebar' \| 'floating' \| 'inset'` | `'sidebar'`   | Visual style.                                                          |
-| `collapsible`      | `'icon' \| 'offcanvas' \| 'none'`    | `'offcanvas'` | Collapse behaviour.                                                    |
-| `side`             | `'left' \| 'right'`                  | `'left'`      | Layout side.                                                           |
-| `overlay`          | `boolean`                            | `false`       | Float over the main content instead of pushing it.                     |
-| `openOnHover`      | `boolean`                            | `false`       | Expand a collapsed sidebar while hovered / focused.                    |
-| `hoverCloseDelay`  | `number` (ms)                        | `150`         | Delay before a hover-opened sidebar collapses.                         |
-| `backdrop`         | `boolean`                            | `false`       | Backdrop while open as an overlay.                                     |
-| `dismissable`      | `boolean`                            | `true`        | Escape / backdrop click close an overlay sidebar.                      |
-| `width`            | `string`                             | `'16rem'`     | Expanded width.                                                        |
-| `iconWidth`        | `string`                             | `'3rem'`      | Icon-rail width.                                                       |
-| `breakpoint`       | `number \| null`                     | `null`        | Below this px width: off-canvas overlay + backdrop, closed by default. |
-| `keyboardShortcut` | `string \| null`                     | `'b'`         | Ctrl/⌘ + key toggles. `null` disables.                                 |
-| `stateKey`         | `string \| null`                     | `null`        | Persist `open` in `localStorage`.                                      |
-| `ariaLabel`        | `string`                             | `'Sidebar'`   | Label of the `<aside>` landmark.                                       |
+| Input              | Type                                 | Default              | Description                                                            |
+| ------------------ | ------------------------------------ | -------------------- | ---------------------------------------------------------------------- |
+| `id`               | `string`                             | auto                 | Used by `ngbSidebarTrigger[target]`, `aria-controls` and the registry. |
+| `open`             | `model<boolean>`                     | `true`               | Two-way expanded state `[(open)]`.                                     |
+| `variant`          | `'sidebar' \| 'floating' \| 'inset'` | `'sidebar'`          | Visual style.                                                          |
+| `collapsible`      | `'icon' \| 'offcanvas' \| 'none'`    | `'offcanvas'`        | Collapse behaviour.                                                    |
+| `side`             | `'left' \| 'right'`                  | `'left'`             | Layout side.                                                           |
+| `overlay`          | `boolean`                            | `false`              | Float over the main content instead of pushing it.                     |
+| `openOnHover`      | `boolean`                            | `false`              | Expand a collapsed sidebar while hovered / focused.                    |
+| `hoverCloseDelay`  | `number` (ms)                        | `150`                | Delay before a hover-opened sidebar collapses.                         |
+| `backdrop`         | `boolean`                            | `false`              | Backdrop while open as an overlay.                                     |
+| `dismissable`      | `boolean`                            | `true`               | Escape / backdrop click close an overlay sidebar.                      |
+| `width`            | `string`                             | `'16rem'`            | Expanded width.                                                        |
+| `iconWidth`        | `string`                             | `'3rem'`             | Icon-rail width.                                                       |
+| `breakpoint`       | `number \| null`                     | `null`               | Below this px width: off-canvas overlay + backdrop, closed by default. |
+| `keyboardShortcut` | `string \| null`                     | `'b'`                | Ctrl/⌘ + key toggles. `null` disables.                                 |
+| `stateKey`         | `string \| null`                     | `null`               | Persist `open` in `localStorage`.                                      |
+| `ariaLabel`        | `string`                             | `'Sidebar'`          | Label of the `<aside>` landmark.                                       |
+| `panelClass`       | `string`                             | `'bg-body-tertiary'` | Bootstrap background/text classes of the panel.                        |
+| `theme`            | `'light' \| 'dark' \| null`          | `null`               | Bootstrap color mode for the sidebar only (`data-bs-theme`).           |
 
 Output: `openChange`. Methods (exportAs `ngbSidebar`): `toggle()`, `expand()`, `collapse()`, `dismiss()`.
 Signals: `state()`, `expanded()`, `isMobile()`, `iconCollapsed()`.
@@ -163,23 +166,23 @@ Inject `NgbSidebarRegistry` to `toggle(id)` / `get(id)` any sidebar from code.
 
 ## Building blocks
 
-| Selector                                               | Notes                                                         |
-| ------------------------------------------------------ | ------------------------------------------------------------- |
-| `ngb-sidebar-layout`                                   | Flex root. `[fill]` (default `true`) = `min-height: 100vh`.   |
-| `ngb-sidebar-main`                                     | Main area; becomes a card with the `inset` variant.           |
-| `ngb-sidebar-backdrop`                                 | Optional explicit backdrop for overlay sidebars.              |
-| `ngb-sidebar-header` / `-content` / `-footer`          | Pinned top, scrollable middle, pinned bottom.                 |
-| `ngb-sidebar-group` (+ `-label`, `-content`)           | Section; `collapsible` + `[(open)]` folds it via the label.   |
-| `[ngbSidebarGroupAction]`                              | Button next to a group label.                                 |
-| `ngb-sidebar-menu` / `ngb-sidebar-menu-sub`            | Lists.                                                        |
-| `ngb-sidebar-menu-item` / `-menu-sub-item`             | `collapsible`, `defaultOpen`, `[(open)]` — nest to any depth. |
-| `[ngbSidebarMenuButton]` / `[ngbSidebarMenuSubButton]` | `isActive`, `tooltip`, `size` (`sm`/`md`/`lg`).               |
-| `ngb-sidebar-menu-badge`                               | Counter.                                                      |
-| `[ngbSidebarMenuAction]`                               | Secondary button, `showOnHover`.                              |
-| `ngb-sidebar-separator`                                | Divider.                                                      |
-| `[ngbSidebarTrigger]`                                  | `target` id, else first sidebar of the layout.                |
-| `[ngbSidebarRail]`                                     | Edge strip that toggles.                                      |
-| `ngb-sidebar-nav`                                      | Data-driven menu (see above).                                 |
+| Selector                                               | Notes                                                                |
+| ------------------------------------------------------ | -------------------------------------------------------------------- |
+| `ngb-sidebar-layout`                                   | Flex root. `[fill]` (default `true`) = `min-height: 100vh`.          |
+| `ngb-sidebar-main`                                     | Main area; becomes a card with the `inset` variant.                  |
+| `ngb-sidebar-backdrop`                                 | Optional explicit backdrop for overlay sidebars.                     |
+| `ngb-sidebar-header` / `-content` / `-footer`          | Pinned top, scrollable middle, pinned bottom.                        |
+| `ngb-sidebar-group` (+ `-label`, `-content`)           | Section; `collapsible` + `[(open)]` folds it via the label.          |
+| `[ngbSidebarGroupAction]`                              | Button next to a group label.                                        |
+| `ngb-sidebar-menu` / `ngb-sidebar-menu-sub`            | Lists.                                                               |
+| `ngb-sidebar-menu-item` / `-menu-sub-item`             | `collapsible`, `defaultOpen`, `[(open)]` — nest to any depth.        |
+| `[ngbSidebarMenuButton]` / `[ngbSidebarMenuSubButton]` | `isActive`, `tooltip`, `size` (`sm`/`md`/`lg`).                      |
+| `ngb-sidebar-menu-badge`                               | Bootstrap `badge`; `badgeClass` sets colors (e.g. `text-bg-danger`). |
+| `[ngbSidebarMenuAction]`                               | Secondary button, `showOnHover`.                                     |
+| `ngb-sidebar-separator`                                | Divider.                                                             |
+| `[ngbSidebarTrigger]`                                  | `target` id, else first sidebar of the layout.                       |
+| `[ngbSidebarRail]`                                     | Edge strip that toggles.                                             |
+| `ngb-sidebar-nav`                                      | Data-driven menu (see above).                                        |
 
 `ngb-sidebar-nav`: `model`, `[(activeItem)]`, `accordion`, `autoExpandActive` (true), `selectOnClick` (true),
 `collapsibleGroups`, `ariaLabel`; outputs `itemClick`, `actionClick`, `expandedChange`;
@@ -191,23 +194,40 @@ disabled, visible, separator, group, tooltip, styleClass, actionIcon, actionLabe
 
 ## Theming
 
-Override on `ngb-sidebar-layout` (or any ancestor):
+Everything visual is a Bootstrap class or variable, so theme it the Bootstrap way:
+
+```html
+<!-- Bootstrap 5.3 color mode for the sidebar only -->
+<ngb-sidebar theme="dark">…</ngb-sidebar>
+
+<!-- Any Bootstrap background utility for the panel (default: bg-body-tertiary) -->
+<ngb-sidebar panelClass="bg-primary-subtle">…</ngb-sidebar>
+
+<!-- Badge colors -->
+<ngb-sidebar-menu-badge badgeClass="text-bg-danger">3</ngb-sidebar-menu-badge>
+```
+
+Active items are Bootstrap **nav pills** — recolor them with Bootstrap's own variables:
 
 ```css
-.my-dark-sidebar {
-  --ngb-sidebar-bg: #111827;
-  --ngb-sidebar-color: #e5e7eb;
-  --ngb-sidebar-muted: #9ca3af;
-  --ngb-sidebar-border-color: #1f2937;
-  --ngb-sidebar-hover-bg: #1f2937;
-  --ngb-sidebar-active-bg: #374151;
-  --ngb-sidebar-active-color: #fff;
-  --ngb-sidebar-radius: 0.5rem;
-  --ngb-sidebar-transition: 200ms ease;
-  --ngb-sidebar-z: 1020;
-  --ngb-sidebar-backdrop: rgba(0, 0, 0, 0.45);
+.my-sidebar .nav-pills {
+  --bs-nav-pills-link-active-bg: #4f46e5;
+  --bs-nav-pills-link-active-color: #fff;
 }
 ```
+
+Sidebar-specific variables: `--ngb-sidebar-width`, `--ngb-sidebar-width-icon` (set via the `width` /
+`iconWidth` inputs), `--ngb-sidebar-transition` and `--ngb-sidebar-z`.
+
+### What is Bootstrap and what is custom
+
+Built from Bootstrap classes: `nav nav-pills` / `nav-link` / `.active` menus, `badge`, `btn` / `btn-link`
+actions, `btn-close`, `offcanvas` + `offcanvas-backdrop` (drawer and sidebar backdrop), borders, rounded
+corners, shadows, `bg-*`, `text-*` and flex/spacing utilities. The drawer has **no custom CSS** at all.
+
+The sidebar ships one small stylesheet only for what Bootstrap has no equivalent for: the collapse mechanics
+(width reservation, icon rail, off-canvas slide, sticky panel), the rail strip, the CSS chevron, hover-only
+actions and a hover background for nav links.
 
 ## `<ngb-drawer>` (overlay panel)
 

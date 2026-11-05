@@ -166,9 +166,10 @@
 <!-- Badge and action -->
 <ng-template #extras let-item>
   @if (item.badge !== undefined && item.badge !== null && item.badge !== '') {
-    <ngb-sidebar-menu-badge [class]="item.badgeClass ?? ''">{{
-      item.badge
-    }}</ngb-sidebar-menu-badge>
+    <ngb-sidebar-menu-badge
+      [badgeClass]="item.badgeClass ?? 'bg-secondary-subtle text-secondary-emphasis'"
+      >{{ item.badge }}</ngb-sidebar-menu-badge
+    >
   }
   @if (item.actionIcon) {
     <button
