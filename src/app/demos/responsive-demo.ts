@@ -50,12 +50,28 @@ const HTML = `
       </div>
     }
   </div>
+  <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="r-swipe" [checked]="swipe()"
+             (change)="swipe.set(!swipe())" />
+      <label class="form-check-label" for="r-swipe">swipe</label>
+    </div>
+    <label class="d-flex align-items-center gap-1" for="r-edge">
+      swipeEdge
+      <input id="r-edge" type="number" min="8" max="96" class="form-control form-control-sm"
+             style="width: 5rem" [value]="swipeEdge()"
+             (change)="swipeEdge.set(+$any($event.target).value)" />
+    </label>
+    <span class="text-body-secondary">
+      <i class="bi bi-hand-index"></i> On a touch screen: swipe in from the edge to open, swipe the panel back to close.
+    </span>
+  </div>
 </div>
 
 <div class="demo-frame">
   <ngb-sidebar-layout [fill]="false">
     <ngb-sidebar #sb="ngbSidebar" id="responsive-demo" collapsible="icon"
-                 [breakpoint]="simulate() ? 100000 : 1024" [mobile]="mobile()"
+                 [breakpoint]="simulate() ? 100000 : 1024" [mobile]="mobile()" [swipe]="swipe()" [swipeEdge]="swipeEdge()"
                  [keyboardShortcut]="null">
       <ngb-sidebar-header>
         <ngb-sidebar-menu>
@@ -128,6 +144,8 @@ import { NGB_SIDEBAR, NgbSidebarMobileOptions, SidebarCollapsible, SidebarSide }
 })
 export class ResponsiveDemo {
   simulate = signal(false);
+  swipe = signal(true);
+  swipeEdge = signal(24);
   active = signal('Home');
 
   // Mobile behavior settings (everything is optional; these are the defaults
@@ -175,6 +193,8 @@ export class ResponsiveDemo {
   static readonly ts = TS;
 
   simulate = signal(false);
+  swipe = signal(true);
+  swipeEdge = signal(24);
   active = signal('Home');
   collapsible = signal<SidebarCollapsible>('offcanvas');
   side = signal<SidebarSide>('left');

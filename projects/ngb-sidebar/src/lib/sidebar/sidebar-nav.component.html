@@ -167,7 +167,7 @@
 <ng-template #extras let-item>
   @if (item.badge !== undefined && item.badge !== null && item.badge !== '') {
     <ngb-sidebar-menu-badge
-      [badgeClass]="item.badgeClass ?? 'bg-secondary-subtle text-secondary-emphasis'"
+      [badgeClass]="item.badgeClass ?? 'bg-body-secondary text-body-secondary'"
       >{{ item.badge }}</ngb-sidebar-menu-badge
     >
   }

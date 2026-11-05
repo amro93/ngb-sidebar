@@ -86,7 +86,8 @@ export class NgbSidebarGroupComponent {
 @Component({
   selector: 'ngb-sidebar-group-label',
   standalone: true,
-  template: SLOT,
+  // Collapsible labels get a chevron automatically (hidden when the label projects its own).
+  template: '<ng-content></ng-content>@if (group?.collapsible()) {<i class="ngb-sidebar-chevron ngb-sidebar-group-chevron ngb-sidebar-group-chevron-auto" aria-hidden="true"></i>}',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class:
@@ -109,7 +110,7 @@ export class NgbSidebarGroupLabelComponent {
   standalone: true,
   host: {
     class:
-      'ngb-sidebar-group-action btn btn-sm btn-link link-secondary p-0 position-absolute top-0 end-0 mt-1 me-3',
+      'ngb-sidebar-group-action btn btn-sm btn-link text-body-secondary p-0 position-absolute top-0 end-0 mt-1 me-3',
   },
 })
 export class NgbSidebarGroupActionDirective {}
@@ -241,7 +242,7 @@ export class NgbSidebarMenuButtonDirective extends MenuButtonBase {}
     class:
       'ngb-sidebar-menu-sub-button nav-link d-flex align-items-center gap-2 w-100 px-2 py-1 small text-start',
     '[class.active]': 'isActive()',
-    '[class.link-secondary]': '!isActive()',
+    '[class.text-body-secondary]': '!isActive()',
     '[attr.data-active]': 'isActive() || null',
     '[attr.data-size]': 'size()',
     '[attr.aria-current]': 'isActive() ? "page" : null',
@@ -265,7 +266,7 @@ export class NgbSidebarMenuSubButtonDirective extends MenuButtonBase {}
 })
 export class NgbSidebarMenuBadgeComponent {
   /** Bootstrap color classes, e.g. `text-bg-danger`. */
-  badgeClass = input<string>('bg-secondary-subtle text-secondary-emphasis');
+  badgeClass = input<string>('bg-body-secondary text-body-secondary');
 }
 
 /** Secondary icon button on a menu item (e.g. "more" menu). */

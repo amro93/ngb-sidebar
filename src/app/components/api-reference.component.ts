@@ -245,9 +245,27 @@ export class ApiReferenceComponent {
       desc: "Mobile behavior: collapsible ('offcanvas'), overlay (true), backdrop (true), defaultOpen (false), closeOnNavigate (true), openOnHover (false), side, variant ('sidebar'), width ('18rem').",
     },
     {
+      name: 'swipe',
+      type: 'boolean',
+      def: 'true',
+      desc: 'Touch swipe to show/hide: swipe in from the edge to open, swipe the panel back to close. Mouse input is ignored.',
+    },
+    {
+      name: 'swipeEdge',
+      type: 'number (px)',
+      def: '24',
+      desc: 'Width of the edge zone where an opening swipe can start.',
+    },
+    {
+      name: 'swipeThreshold',
+      type: 'number (0–1)',
+      def: '0.3',
+      desc: 'Fraction of the panel width a swipe must travel to toggle (a quick flick also works).',
+    },
+    {
       name: 'provideNgbSidebarConfig()',
       type: 'provider',
-      desc: 'App-wide defaults: { breakpoint, mobile }. Inputs override them.',
+      desc: 'App-wide defaults: { breakpoint, mobile, swipe, swipeEdge, swipeThreshold }. Inputs override them.',
     },
     {
       name: 'keyboardShortcut',

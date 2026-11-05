@@ -3,6 +3,7 @@ import {
   Component,
   DOCUMENT,
   DestroyRef,
+  ElementRef,
   OnInit,
   PLATFORM_ID,
   ViewEncapsulation,
@@ -14,11 +15,13 @@ import {
   model,
   numberAttribute,
   signal,
+  viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { NGB_SIDEBAR_VERSION } from '../version';
 import { NGB_SIDEBAR_LAYOUT, NgbSidebarRegistry } from './sidebar.registry';
 import { NGB_SIDEBAR_CONFIG, NGB_SIDEBAR_MOBILE_DEFAULTS } from './sidebar.config';
+import { SidebarSwipe } from './sidebar.swipe';
 import {
   NgbSidebarMobileOptions,
   SidebarCollapsible,
@@ -123,6 +126,18 @@ export class NgbSidebarComponent implements OnInit {
   theme = input<'light' | 'dark' | null>(null);
   /** Delay (ms) before a hover-opened sidebar collapses after the pointer leaves. */
   hoverCloseDelay = input(150, { transform: numberAttribute });
+  /**
+   * Touch swipe to show/hide: swipe in from the sidebar's edge to open, swipe the panel back to close.
+   * Mouse input is ignored. Default from `provideNgbSidebarConfig()` (built-in: `true`).
+   */
+  swipe = input(this.config.swipe ?? true, { transform: booleanAttribute });
+  /** Width (px) of the edge zone where an opening swipe can start. Default `24`. */
+  swipeEdge = input(this.config.swipeEdge ?? 24, { transform: numberAttribute });
+  /** Fraction (0–1) of the panel width a swipe must travel to toggle (a quick flick also works). */
+  swipeThreshold = input(this.config.swipeThreshold ?? 0.3, { transform: numberAttribute });
+
+  private readonly asideRef = viewChild<ElementRef<HTMLElement>>('aside');
+  private readonly hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Viewport is below `breakpoint`. */
   readonly isMobile = signal(false);
@@ -193,6 +208,36 @@ export class NgbSidebarComponent implements OnInit {
     const destroyRef = inject(DestroyRef);
     const onKey = (e: KeyboardEvent) => this.onDocumentKeydown(e);
     this.document.addEventListener('keydown', onKey);
+    // Touch swipe gestures (passive listeners: never block scrolling).
+    if (this.isBrowser) {
+      const swipe = new SidebarSwipe(
+        {
+          enabled: () => this.swipe(),
+          edge: () => this.swipeEdge(),
+          threshold: () => this.swipeThreshold(),
+          isOpen: () => this.expanded(),
+          collapsible: () => this.effectiveCollapsible(),
+          side: () => this.effectiveSide(),
+          container: () => this.hostRef.nativeElement.closest('ngb-sidebar-layout'),
+          panel: () => this.asideRef()?.nativeElement ?? null,
+          host: () => this.hostRef.nativeElement,
+          setOpen: (open) => (open ? this.expand() : this.collapse()),
+        },
+        this.document,
+      );
+      const opts: AddEventListenerOptions = { passive: true };
+      this.document.addEventListener('touchstart', swipe.onStart, opts);
+      this.document.addEventListener('touchmove', swipe.onMove, opts);
+      this.document.addEventListener('touchend', swipe.onEnd, opts);
+      this.document.addEventListener('touchcancel', swipe.onCancel, opts);
+      destroyRef.onDestroy(() => {
+        this.document.removeEventListener('touchstart', swipe.onStart);
+        this.document.removeEventListener('touchmove', swipe.onMove);
+        this.document.removeEventListener('touchend', swipe.onEnd);
+        this.document.removeEventListener('touchcancel', swipe.onCancel);
+      });
+    }
+
     destroyRef.onDestroy(() => {
       this.document.removeEventListener('keydown', onKey);
       if (this.hoverTimer) clearTimeout(this.hoverTimer);

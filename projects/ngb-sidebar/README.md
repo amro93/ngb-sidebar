@@ -29,6 +29,7 @@ standard Bootstrap environments. Standalone, signal-based, no runtime dependenci
 - 📱 **Adaptive mobile behavior** - `breakpoint` + configurable `mobile` settings (off-canvas, backdrop, close on navigate, side, width), app-wide with `provideNgbSidebarConfig()`.
 - 🗂️ **Menus & unlimited sub-menus** - collapsible groups, badges, hover actions, tooltips in icon mode.
 - 🧠 **Data-driven menu** - `<ngb-sidebar-nav [model]>` with active tracking, accordion mode and custom item template.
+- 👆 **Touch swipe** - swipe in from the edge to open, swipe back to close; the panel follows the finger (`swipe`, `swipeEdge`, `swipeThreshold`).
 - ⌨️ **Keyboard** - Ctrl/⌘+B toggle, Escape to dismiss, focus management; persisted state (`localStorage`).
 - 🌍 **RTL** - mirrors under `dir="rtl"` with Bootstrap's RTL stylesheet (`side="left"` = start edge).
 - ♿ **Accessible** - landmarks, list roles, `aria-current`, `aria-expanded`, `aria-controls`, `inert`.
@@ -154,6 +155,24 @@ bootstrapApplication(App, {
 
 Precedence: built-in defaults < `provideNgbSidebarConfig` < the `[mobile]` / `[breakpoint]` inputs.
 
+### Touch swipe to show / hide
+
+On touch screens, swipe in from the sidebar's edge to open it (or swipe on a collapsed icon rail), and
+swipe the open panel back toward its edge to close it. The off-canvas panel follows the finger and snaps
+open or closed by distance or flick speed. Vertical scrolling and mouse input are never affected.
+
+```html
+<ngb-sidebar [swipe]="true" [swipeEdge]="32" [swipeThreshold]="0.25">…</ngb-sidebar>
+```
+
+| Property         | Default | Description                                                         |
+| ---------------- | ------- | ------------------------------------------------------------------- |
+| `swipe`          | `true`  | Enable touch swipe gestures.                                        |
+| `swipeEdge`      | `24`    | Width (px) of the edge zone where an opening swipe can start.       |
+| `swipeThreshold` | `0.3`   | Fraction of the panel width a swipe must travel (flicks also work). |
+
+App-wide: `provideNgbSidebarConfig({ swipe: true, swipeEdge: 32, swipeThreshold: 0.25 })`.
+
 ### Data-driven menu (nested hierarchy)
 
 ```ts
@@ -241,6 +260,9 @@ like Bootstrap's `offcanvas-start`.
 | `iconWidth`        | `string`                             | `'3rem'`             | Icon-rail width.                                                          |
 | `breakpoint`       | `number \| null`                     | `null`               | Below this px width the `mobile` settings apply (app default via config). |
 | `mobile`           | `Partial<NgbSidebarMobileOptions>`   | `{}`                 | Mobile behavior, see below.                                               |
+| `swipe`            | `boolean`                            | `true`               | Touch swipe to show/hide (edge swipe opens, swipe back closes).           |
+| `swipeEdge`        | `number` (px)                        | `24`                 | Edge zone where an opening swipe can start.                               |
+| `swipeThreshold`   | `number` (0–1)                       | `0.3`                | Fraction of the width a swipe must travel to toggle.                      |
 | `keyboardShortcut` | `string \| null`                     | `'b'`                | Ctrl/⌘ + key toggles. `null` disables.                                    |
 | `stateKey`         | `string \| null`                     | `null`               | Persist `open` in `localStorage`.                                         |
 | `ariaLabel`        | `string`                             | `'Sidebar'`          | Label of the `<aside>` landmark.                                          |

@@ -78,6 +78,7 @@
   z-index: var(--ngb-sidebar-z);
   display: flex;
   width: var(--_w);
+  touch-action: pan-y; // horizontal swipes open/close the sidebar
   transition:
     width var(--ngb-sidebar-transition),
     transform var(--ngb-sidebar-transition);
@@ -191,9 +192,17 @@
 
   &[role='button'] {
     cursor: pointer;
+
+    &:hover {
+      color: var(--bs-emphasis-color);
+    }
   }
   .ngb-sidebar-group-chevron {
     margin-inline-start: auto;
+  }
+  // a label that brings its own chevron keeps only that one
+  &:has(.ngb-sidebar-group-chevron:not(.ngb-sidebar-group-chevron-auto)) > .ngb-sidebar-group-chevron-auto {
+    display: none;
   }
   [data-open='false'] > & .ngb-sidebar-group-chevron::before {
     transform: rotate(-45deg);
@@ -341,6 +350,16 @@
     color: var(--bs-nav-pills-link-active-color);
     background-color: var(--bs-nav-pills-link-active-bg);
   }
+}
+
+// Mobile drawer open: freeze the page behind it (like Bootstrap's offcanvas) and keep
+// scrolling inside the drawer from chaining to the page.
+html:has(.ngb-sidebar-overlay[data-mobile='true'].ngb-sidebar-expanded),
+body:has(.ngb-sidebar-overlay[data-mobile='true'].ngb-sidebar-expanded) {
+  overflow: hidden !important;
+}
+.ngb-sidebar-overlay[data-mobile='true'] .ngb-sidebar-content {
+  overscroll-behavior: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {

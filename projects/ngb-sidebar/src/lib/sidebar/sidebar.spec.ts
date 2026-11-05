@@ -266,6 +266,11 @@ describe('NgbSidebar (navigation)', () => {
     expect(host.groupOpen()).toBe(true);
   });
 
+  it('collapsible group labels render a chevron automatically', () => {
+    const label = el('ngb-sidebar-group-label');
+    expect(label.querySelector('.ngb-sidebar-group-chevron-auto')).not.toBeNull();
+  });
+
   it('exposes VERSION', () => {
     expect(NgbSidebarComponent.VERSION).toMatch(/^\d+\.\d+\.\d+/);
   });
@@ -546,5 +551,162 @@ describe('NgbSidebar mobile behavior', () => {
     setViewport(true);
     expect(host.open()).toBe(true);
     expect(el('ngb-sidebar').dataset['side']).toBe('right');
+  });
+});
+
+@Component({
+  standalone: true,
+  imports: [...NGB_SIDEBAR],
+  template: `
+    <ngb-sidebar-layout [fill]="false">
+      <ngb-sidebar
+        [collapsible]="collapsible()"
+        [swipe]="swipe()"
+        [(open)]="open"
+        [keyboardShortcut]="null"
+      >
+        <ngb-sidebar-content><span id="inside">x</span></ngb-sidebar-content>
+      </ngb-sidebar>
+      <ngb-sidebar-main><span id="outside">y</span></ngb-sidebar-main>
+    </ngb-sidebar-layout>
+  `,
+})
+class SwipeHostCmp {
+  open = signal(false);
+  swipe = signal(true);
+  collapsible = signal<SidebarCollapsible>('offcanvas');
+}
+
+describe('NgbSidebar swipe gestures', () => {
+  let fixture: ComponentFixture<SwipeHostCmp>;
+  let host: SwipeHostCmp;
+  const render = () => {
+    fixture.detectChanges();
+    TestBed.tick();
+    fixture.detectChanges();
+  };
+  const touch = (type: string, target: Element, x: number, y = 100) => {
+    const e = new Event(type, { bubbles: true });
+    const list = type === 'touchend' ? [] : [{ clientX: x, clientY: y }];
+    Object.defineProperty(e, 'touches', { value: list });
+    target.dispatchEvent(e);
+  };
+  const swipe = (target: Element, from: number, to: number, y0 = 100, y1 = 100) => {
+    touch('touchstart', target, from, y0);
+    touch('touchmove', target, from + (to - from) / 2, (y0 + y1) / 2);
+    touch('touchmove', target, to, y1);
+    touch('touchend', target, to, y1);
+    render();
+  };
+  const el = (sel: string) => fixture.nativeElement.querySelector(sel) as HTMLElement;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({ imports: [SwipeHostCmp] }).compileComponents();
+    fixture = TestBed.createComponent(SwipeHostCmp);
+    host = fixture.componentInstance;
+    render();
+  });
+
+  afterEach(() => fixture.destroy());
+
+  it('opens with an inward swipe that starts at the edge', () => {
+    swipe(el('#outside'), 5, 200);
+    expect(host.open()).toBe(true);
+  });
+
+  it('ignores swipes that start away from the edge', () => {
+    swipe(el('#outside'), 120, 300);
+    expect(host.open()).toBe(false);
+  });
+
+  it('ignores vertical gestures (scrolling)', () => {
+    swipe(el('#outside'), 5, 20, 100, 400);
+    expect(host.open()).toBe(false);
+  });
+
+  it('closes when the open panel is swiped back toward its edge', () => {
+    host.open.set(true);
+    render();
+    swipe(el('#inside'), 200, 20);
+    expect(host.open()).toBe(false);
+  });
+
+  it('does not close when swiping inward on the open panel', () => {
+    host.open.set(true);
+    render();
+    swipe(el('#inside'), 20, 200);
+    expect(host.open()).toBe(true);
+  });
+
+  it('opens a collapsed icon rail by swiping on it', () => {
+    host.collapsible.set('icon');
+    render();
+    swipe(el('#inside'), 60, 250);
+    expect(host.open()).toBe(true);
+  });
+
+  it('can be disabled with [swipe]="false"', () => {
+    host.swipe.set(false);
+    render();
+    swipe(el('#outside'), 5, 200);
+    expect(host.open()).toBe(false);
+  });
+
+  it("does nothing when collapsible='none'", () => {
+    host.collapsible.set('none');
+    render();
+    swipe(el('#outside'), 5, 200);
+    expect(host.open()).toBe(false);
+  });
+
+  it('clears the inline drag styles after the gesture', () => {
+    swipe(el('#outside'), 5, 200);
+    const aside = el('aside');
+    expect(aside.style.transform).toBe('');
+    expect(aside.style.transition).toBe('');
+  });
+});
+
+@Component({
+  standalone: true,
+  imports: [...NGB_SIDEBAR],
+  template: `
+    <ngb-sidebar-layout [fill]="false">
+      <ngb-sidebar [(open)]="a" [keyboardShortcut]="null" />
+      <ngb-sidebar-main><span id="in-a">a</span></ngb-sidebar-main>
+    </ngb-sidebar-layout>
+    <ngb-sidebar-layout [fill]="false">
+      <ngb-sidebar [(open)]="b" [keyboardShortcut]="null" />
+      <ngb-sidebar-main><span id="in-b">b</span></ngb-sidebar-main>
+    </ngb-sidebar-layout>
+  `,
+})
+class TwoLayoutsCmp {
+  a = signal(false);
+  b = signal(false);
+}
+
+describe('NgbSidebar swipe with several layouts', () => {
+  it('only opens the sidebar of the layout the swipe started in', async () => {
+    await TestBed.configureTestingModule({ imports: [TwoLayoutsCmp] }).compileComponents();
+    const fixture = TestBed.createComponent(TwoLayoutsCmp);
+    fixture.detectChanges();
+    const target = fixture.nativeElement.querySelector('#in-b') as HTMLElement;
+    for (const [type, x] of [
+      ['touchstart', 5],
+      ['touchmove', 100],
+      ['touchmove', 200],
+      ['touchend', 200],
+    ] as const) {
+      const e = new Event(type, { bubbles: true });
+      Object.defineProperty(e, 'touches', {
+        value: type === 'touchend' ? [] : [{ clientX: x, clientY: 50 }],
+      });
+      target.dispatchEvent(e);
+    }
+    fixture.detectChanges();
+    expect(fixture.componentInstance.b()).toBe(true);
+    expect(fixture.componentInstance.a()).toBe(false);
+    fixture.destroy();
   });
 });

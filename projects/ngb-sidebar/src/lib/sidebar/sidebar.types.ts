@@ -89,6 +89,12 @@ export interface NgbSidebarConfig {
   breakpoint: number | null;
   /** Default mobile behavior for every sidebar. */
   mobile: Partial<NgbSidebarMobileOptions>;
+  /** Default for the `swipe` input (touch swipe to show/hide). */
+  swipe: boolean;
+  /** Default for the `swipeEdge` input (px). */
+  swipeEdge: number;
+  /** Default for the `swipeThreshold` input (0–1). */
+  swipeThreshold: number;
 }
 
 export interface SidebarItemClickEvent {

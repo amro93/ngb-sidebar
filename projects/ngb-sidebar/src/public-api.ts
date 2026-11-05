@@ -4,6 +4,7 @@ export * from './lib/version';
 export * from './lib/sidebar/sidebar.types';
 export * from './lib/sidebar/sidebar.registry';
 export * from './lib/sidebar/sidebar.config';
+export * from './lib/sidebar/sidebar.swipe';
 export * from './lib/sidebar/sidebar.component';
 export * from './lib/sidebar/sidebar-layout';
 export * from './lib/sidebar/sidebar-parts';
