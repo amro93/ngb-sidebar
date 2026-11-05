@@ -11,6 +11,12 @@
   --ngb-sidebar-z: 1030;
   isolation: isolate;
 
+  // A mobile drawer must stack above the app's own fixed/sticky chrome (navbars etc.),
+  // so the layout stops being a stacking context while it hosts one.
+  &:has(> .ngb-sidebar-overlay[data-mobile='true']) {
+    isolation: auto;
+  }
+
   > .ngb-sidebar-backdrop {
     z-index: calc(var(--ngb-sidebar-z) + 5);
   }
@@ -100,6 +106,16 @@
   .ngb-sidebar-floating-panel > & {
     z-index: calc(var(--ngb-sidebar-z) + 10);
   }
+  // Mobile overlay = a real drawer: pinned to the viewport edge at full height wherever the
+  // sidebar sits in the page. Being fixed also keeps a closed (translated) panel from widening
+  // the page and makes percentage widths (e.g. mobile.width = '85%') relative to the viewport.
+  .ngb-sidebar-overlay[data-mobile='true'] > & {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    max-width: 100vw;
+    z-index: calc(var(--ngb-sidebar-z) + 10);
+  }
 }
 
 // Sticky so header/footer stay in view while the page scrolls.
@@ -161,8 +177,9 @@
 // Groups
 .ngb-sidebar-group {
   min-width: 0;
+  // !important: the content host carries Bootstrap's `d-block`, which is itself !important.
   &[data-collapsible][data-open='false'] > .ngb-sidebar-group-content {
-    display: none;
+    display: none !important;
   }
 }
 .ngb-sidebar-group-label {
