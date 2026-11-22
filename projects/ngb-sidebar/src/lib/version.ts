@@ -1,1 +1,1 @@
-export const NGB_SIDEBAR_VERSION = '0.1.4';
+export const NGB_SIDEBAR_VERSION = '0.2.0';
