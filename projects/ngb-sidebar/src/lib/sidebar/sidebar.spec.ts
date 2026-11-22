@@ -876,3 +876,68 @@ describe('NgbSidebar in RTL', () => {
     expect(host.open()).toBe(false);
   });
 });
+
+@Component({
+  standalone: true,
+  imports: [...NGB_SIDEBAR],
+  template: `
+    <ngb-sidebar-layout [fill]="false">
+      <ngb-sidebar [keyboardShortcut]="null">
+        <ngb-sidebar-content>
+          <ngb-sidebar-menu id="m1">
+            <ngb-sidebar-menu-item collapsible defaultOpen>
+              <button ngbSidebarMenuButton>P</button>
+              <ngb-sidebar-menu-sub id="s1"
+                ><ngb-sidebar-menu-sub-item
+                  ><button ngbSidebarMenuSubButton>C</button></ngb-sidebar-menu-sub-item
+                ></ngb-sidebar-menu-sub
+              >
+            </ngb-sidebar-menu-item>
+          </ngb-sidebar-menu>
+          <ngb-sidebar-menu id="m2" menuClass="nav-tabs">
+            <ngb-sidebar-menu-item collapsible defaultOpen>
+              <button ngbSidebarMenuButton>P</button>
+              <ngb-sidebar-menu-sub id="s2"
+                ><ngb-sidebar-menu-sub-item
+                  ><button ngbSidebarMenuSubButton>C</button></ngb-sidebar-menu-sub-item
+                ></ngb-sidebar-menu-sub
+              >
+            </ngb-sidebar-menu-item>
+          </ngb-sidebar-menu>
+        </ngb-sidebar-content>
+      </ngb-sidebar>
+      <ngb-sidebar-main></ngb-sidebar-main>
+    </ngb-sidebar-layout>
+  `,
+})
+class MenuClassHostCmp {}
+
+describe('NgbSidebar menuClass', () => {
+  const cls = (f: ComponentFixture<MenuClassHostCmp>, id: string) =>
+    (f.nativeElement.querySelector('#' + id) as HTMLElement).classList;
+
+  it('menus are nav-pills by default; menuClass switches a menu and its sub menus', async () => {
+    await TestBed.configureTestingModule({ imports: [MenuClassHostCmp] }).compileComponents();
+    const f = TestBed.createComponent(MenuClassHostCmp);
+    f.detectChanges();
+    expect(cls(f, 'm1')).toContain('nav-pills');
+    expect(cls(f, 's1')).toContain('nav-pills');
+    expect(cls(f, 'm1')).toContain('ngb-sidebar-menu');
+    expect(cls(f, 'm2')).toContain('nav-tabs');
+    expect(cls(f, 'm2')).not.toContain('nav-pills');
+    expect(cls(f, 's2')).toContain('nav-tabs');
+    expect(cls(f, 's2')).toContain('ngb-sidebar-menu-sub');
+  });
+
+  it('provideNgbSidebarConfig({ menuClass }) sets the default for every menu', async () => {
+    await TestBed.configureTestingModule({
+      imports: [MenuClassHostCmp],
+      providers: [provideNgbSidebarConfig({ menuClass: 'nav-tabs' })],
+    }).compileComponents();
+    const f = TestBed.createComponent(MenuClassHostCmp);
+    f.detectChanges();
+    expect(cls(f, 'm1')).toContain('nav-tabs');
+    expect(cls(f, 's1')).toContain('nav-tabs');
+    expect(cls(f, 'm1')).not.toContain('nav-pills');
+  });
+});

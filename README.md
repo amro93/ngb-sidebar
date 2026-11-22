@@ -158,6 +158,19 @@ bootstrapApplication(App, {
 
 Precedence: built-in defaults < `provideNgbSidebarConfig` < the `[mobile]` / `[breakpoint]` inputs.
 
+### Menu style (pills or vertical tabs)
+
+Menus render as Bootstrap `nav-pills`. Design systems that style **vertical tabs** (`.nav-tabs.flex-column`, e.g. an
+active bar on the start edge) can switch every menu app-wide, or one menu with its input; sub menus follow their menu.
+
+```ts
+provideNgbSidebarConfig({ menuClass: 'nav-tabs' });
+```
+
+```html
+<ngb-sidebar-menu menuClass="nav-tabs">…</ngb-sidebar-menu>
+```
+
 ### Touch swipe to show / hide
 
 On touch screens, swipe in from the sidebar's edge to open it (or swipe on a collapsed icon rail), and
@@ -290,7 +303,7 @@ Inject `NgbSidebarRegistry` to `toggle(id)` / `get(id)` any sidebar from code.
 | `ngb-sidebar-header` / `-content` / `-footer`          | Pinned top, scrollable middle, pinned bottom.                        |
 | `ngb-sidebar-group` (+ `-label`, `-content`)           | Section; `collapsible` + `[(open)]` folds it via the label.          |
 | `[ngbSidebarGroupAction]`                              | Button next to a group label.                                        |
-| `ngb-sidebar-menu` / `ngb-sidebar-menu-sub`            | Lists.                                                               |
+| `ngb-sidebar-menu` / `ngb-sidebar-menu-sub`            | Lists. `menuClass` (default `nav-pills`), e.g. `nav-tabs`.           |
 | `ngb-sidebar-menu-item` / `-menu-sub-item`             | `collapsible`, `defaultOpen`, `[(open)]` — nest to any depth.        |
 | `[ngbSidebarMenuButton]` / `[ngbSidebarMenuSubButton]` | `isActive`, `tooltip`, `size` (`sm`/`md`/`lg`).                      |
 | `ngb-sidebar-menu-badge`                               | Bootstrap `badge`; `badgeClass` sets colors (e.g. `text-bg-danger`). |

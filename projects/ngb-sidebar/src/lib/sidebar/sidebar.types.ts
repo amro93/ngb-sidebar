@@ -95,6 +95,11 @@ export interface NgbSidebarConfig {
   swipeEdge: number;
   /** Default for the `swipeThreshold` input (0–1). */
   swipeThreshold: number;
+  /**
+   * Bootstrap nav style of every `<ngb-sidebar-menu>` / `<ngb-sidebar-menu-sub>`, e.g. `'nav-tabs'` for a design
+   * system that styles vertical tabs. Default `'nav-pills'`.
+   */
+  menuClass?: string;
 }
 
 export interface SidebarItemClickEvent {

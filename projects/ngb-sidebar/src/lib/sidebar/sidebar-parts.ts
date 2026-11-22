@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { NgbSidebarComponent } from './sidebar.component';
 import { NGB_SIDEBAR_LAYOUT, NgbSidebarRegistry } from './sidebar.registry';
+import { NGB_SIDEBAR_CONFIG } from './sidebar.config';
 import { SidebarMenuButtonSize } from './sidebar.types';
 
 const SLOT = '<ng-content></ng-content>';
@@ -132,9 +133,20 @@ export class NgbSidebarGroupContentComponent {}
   standalone: true,
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'ngb-sidebar-menu nav nav-pills flex-column flex-nowrap gap-1', role: 'list' },
+  host: {
+    class: 'ngb-sidebar-menu nav flex-column flex-nowrap gap-1',
+    role: 'list',
+    '[class]': 'navClass()',
+  },
 })
-export class NgbSidebarMenuComponent {}
+export class NgbSidebarMenuComponent {
+  private readonly config = inject(NGB_SIDEBAR_CONFIG);
+  /** Bootstrap nav style, e.g. `'nav-tabs'`. Default: `provideNgbSidebarConfig({ menuClass })`, else `'nav-pills'`. */
+  menuClass = input<string | undefined>(undefined);
+  protected readonly navClass = computed(
+    () => this.menuClass() ?? this.config.menuClass ?? 'nav-pills',
+  );
+}
 
 /** Nested list of sub items inside a (collapsible) menu item. */
 @Component({
@@ -143,12 +155,20 @@ export class NgbSidebarMenuComponent {}
   template: SLOT,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class:
-      'ngb-sidebar-menu-sub nav nav-pills flex-column flex-nowrap gap-1 border-start ms-3 ps-2 my-1',
+    class: 'ngb-sidebar-menu-sub nav flex-column flex-nowrap gap-1 border-start ms-3 ps-2 my-1',
     role: 'list',
+    '[class]': 'navClass()',
   },
 })
-export class NgbSidebarMenuSubComponent {}
+export class NgbSidebarMenuSubComponent {
+  private readonly config = inject(NGB_SIDEBAR_CONFIG);
+  private readonly menu = inject(NgbSidebarMenuComponent, { optional: true });
+  /** Bootstrap nav style; defaults to the enclosing menu's, then the app config, then `'nav-pills'`. */
+  menuClass = input<string | undefined>(undefined);
+  protected readonly navClass = computed(
+    () => this.menuClass() ?? this.menu?.menuClass() ?? this.config.menuClass ?? 'nav-pills',
+  );
+}
 
 /**
  * A menu entry. Use `<ngb-sidebar-menu-item>` at the first level and `<ngb-sidebar-menu-sub-item>`
