@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NGB_SIDEBAR } from './sidebar.module';
 import { NgbSidebarComponent } from './sidebar.component';
 import { NgbSidebarRegistry } from './sidebar.registry';
+import { isRtl } from './sidebar.swipe';
 import { provideNgbSidebarConfig } from './sidebar.config';
 import {
   NgbSidebarMenuItem,
@@ -244,6 +245,22 @@ describe('NgbSidebar (navigation)', () => {
     expect(host.itemOpen()).toBe(true);
     expect(item.dataset['open']).toBe('true');
     expect(parent.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('in a collapsed icon rail, a collapsible item expands the sidebar and opens its sub menu', () => {
+    host.open.set(false);
+    render();
+    expect(sidebar().dataset['state']).toBe('collapsed');
+    el('#parent').click();
+    render();
+    expect(host.open()).toBe(true);
+    expect(sidebar().dataset['state']).toBe('expanded');
+    expect(host.itemOpen()).toBe(true);
+    // Expanded again, the same button folds the item as usual.
+    el('#parent').click();
+    render();
+    expect(host.itemOpen()).toBe(false);
+    expect(host.open()).toBe(true);
   });
 
   it('active button has aria-current and data-active; badges and roles render', () => {
@@ -708,5 +725,154 @@ describe('NgbSidebar swipe with several layouts', () => {
     expect(fixture.componentInstance.b()).toBe(true);
     expect(fixture.componentInstance.a()).toBe(false);
     fixture.destroy();
+  });
+});
+
+// RTL (dir="rtl", e.g. Arabic): `side="left"` is the inline START edge, which is the physical right.
+// jsdom has no layout, so the layout box is stubbed and the direction is set inline.
+@Component({
+  standalone: true,
+  imports: [...NGB_SIDEBAR],
+  template: `
+    <div dir="rtl" style="direction: rtl">
+      <ngb-sidebar-layout [fill]="false">
+        <ngb-sidebar
+          id="rtl"
+          [side]="side()"
+          [collapsible]="collapsible()"
+          [(open)]="open"
+          [keyboardShortcut]="null"
+          ariaLabel="القائمة"
+        >
+          <ngb-sidebar-content>
+            <ngb-sidebar-menu>
+              <ngb-sidebar-menu-item collapsible [(open)]="itemOpen">
+                <button id="rtl-parent" ngbSidebarMenuButton tooltip="المواعيد">
+                  <i></i><span>المواعيد</span>
+                </button>
+                <ngb-sidebar-menu-sub>
+                  <ngb-sidebar-menu-sub-item>
+                    <button id="rtl-child" ngbSidebarMenuSubButton>لوحة المواعيد</button>
+                  </ngb-sidebar-menu-sub-item>
+                </ngb-sidebar-menu-sub>
+              </ngb-sidebar-menu-item>
+            </ngb-sidebar-menu>
+            <span id="rtl-inside">x</span>
+          </ngb-sidebar-content>
+        </ngb-sidebar>
+        <ngb-sidebar-main
+          ><span id="rtl-outside">y</span><button id="rtl-trigger" ngbSidebarTrigger></button
+        ></ngb-sidebar-main>
+      </ngb-sidebar-layout>
+    </div>
+  `,
+})
+class RtlHostCmp {
+  open = signal(false);
+  side = signal<'left' | 'right'>('left');
+  collapsible = signal<SidebarCollapsible>('offcanvas');
+  itemOpen = signal(false);
+}
+
+describe('NgbSidebar in RTL', () => {
+  let fixture: ComponentFixture<RtlHostCmp>;
+  let host: RtlHostCmp;
+  const WIDTH = 1000;
+  const render = () => {
+    fixture.detectChanges();
+    TestBed.tick();
+    fixture.detectChanges();
+  };
+  const el = (sel: string) => fixture.nativeElement.querySelector(sel) as HTMLElement;
+  const touch = (type: string, target: Element, x: number, y = 100) => {
+    const e = new Event(type, { bubbles: true });
+    Object.defineProperty(e, 'touches', {
+      value: type === 'touchend' ? [] : [{ clientX: x, clientY: y }],
+    });
+    target.dispatchEvent(e);
+  };
+  const swipe = (target: Element, from: number, to: number) => {
+    touch('touchstart', target, from);
+    touch('touchmove', target, from + (to - from) / 2);
+    touch('touchmove', target, to);
+    touch('touchend', target, to);
+    render();
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await TestBed.configureTestingModule({ imports: [RtlHostCmp] }).compileComponents();
+    fixture = TestBed.createComponent(RtlHostCmp);
+    host = fixture.componentInstance;
+    render();
+    const box = {
+      left: 0,
+      right: WIDTH,
+      top: 0,
+      bottom: 600,
+      width: WIDTH,
+      height: 600,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    } as DOMRect;
+    (el('ngb-sidebar-layout') as HTMLElement).getBoundingClientRect = () => box;
+  });
+
+  afterEach(() => fixture.destroy());
+
+  it('keeps the logical side and labels; the direction comes from the document', () => {
+    const sb = el('ngb-sidebar');
+    expect(sb.dataset['side']).toBe('left');
+    expect(isRtl(sb)).toBe(true);
+    expect(el('aside').getAttribute('aria-label')).toBe('القائمة');
+  });
+
+  it('opens with a swipe from the RIGHT edge toward the centre', () => {
+    swipe(el('#rtl-outside'), WIDTH - 5, WIDTH - 200);
+    expect(host.open()).toBe(true);
+  });
+
+  it('ignores a swipe from the left edge (the far side in RTL)', () => {
+    swipe(el('#rtl-outside'), 5, 200);
+    expect(host.open()).toBe(false);
+  });
+
+  it('closes when the open panel is swiped back toward the right edge', () => {
+    host.open.set(true);
+    render();
+    swipe(el('#rtl-inside'), WIDTH - 200, WIDTH - 20);
+    expect(host.open()).toBe(false);
+  });
+
+  it('does not close when the open panel is swiped toward the centre', () => {
+    host.open.set(true);
+    render();
+    swipe(el('#rtl-inside'), WIDTH - 200, WIDTH - 400);
+    expect(host.open()).toBe(true);
+  });
+
+  it('side="right" is the inline END in RTL: it opens from the LEFT edge', () => {
+    host.side.set('right');
+    render();
+    swipe(el('#rtl-outside'), WIDTH - 5, WIDTH - 200);
+    expect(host.open()).toBe(false);
+    swipe(el('#rtl-outside'), 5, 200);
+    expect(host.open()).toBe(true);
+  });
+
+  it('the trigger, tooltips and the icon-rail click work the same in RTL', () => {
+    host.collapsible.set('icon');
+    render();
+    const parent = el('#rtl-parent');
+    expect(parent.getAttribute('title')).toBe('المواعيد');
+    parent.click();
+    render();
+    expect(host.open()).toBe(true);
+    expect(host.itemOpen()).toBe(true);
+    expect(parent.getAttribute('title')).toBeNull();
+    el('#rtl-trigger').click();
+    render();
+    expect(host.open()).toBe(false);
   });
 });

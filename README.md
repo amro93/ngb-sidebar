@@ -115,6 +115,9 @@ export class Shell {}
 
 > In icon mode a menu button keeps only its **first child** visible (icon, logo or avatar) and shows its
 > `tooltip` as `title`. Add `.ngb-sidebar-hide-collapsed` to any element to hide it while collapsed.
+>
+> A `collapsible` menu item clicked in a collapsed icon rail expands the sidebar and opens the item, so its
+> sub-pages are one click away (its sub menu is hidden while the rail is collapsed).
 
 ### Mobile behavior (adaptive UI)
 
@@ -224,6 +227,10 @@ routerLinkActive #rla="routerLinkActive" [isActive]="rla.isActive">`, or call `r
 The sidebar uses CSS logical properties, and every directional class it renders is a Bootstrap utility, so
 it mirrors itself with Bootstrap's official RTL build. `side="left"` means the **start** edge (right in RTL),
 like Bootstrap's `offcanvas-start`.
+
+Touch swipes follow the direction too: in RTL a `side="left"` sidebar opens with a swipe from the **right** edge.
+The direction is the computed `direction`, or the nearest `dir` attribute where the environment computes none
+(jsdom, some embedded renderers). The RTL behaviour is covered by the unit tests (`NgbSidebar in RTL`).
 
 ```html
 <!-- index.html -->

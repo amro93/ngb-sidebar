@@ -59,7 +59,7 @@ export class SidebarSwipe {
     const container = this.host.container();
     const target = e.target as Node | null;
     if (container && !(target && container.contains(target))) return;
-    const rtl = getComputedStyle(this.host.host()).direction === 'rtl';
+    const rtl = isRtl(this.host.host());
     const startSide = this.host.side() === 'left'; // 'left' = inline start
     const physicalLeft = startSide !== rtl;
     const sign = physicalLeft ? 1 : -1;
@@ -154,4 +154,14 @@ export class SidebarSwipe {
     panel.style.transition = '';
     panel.style.visibility = '';
   }
+}
+
+/**
+ * Text direction of `el`: the computed `direction`, or, where the environment computes none (jsdom, some embedded
+ * renderers), the nearest `dir` attribute. `dir="auto"` and no attribute count as LTR.
+ */
+export function isRtl(el: Element): boolean {
+  const computed = el.ownerDocument?.defaultView?.getComputedStyle(el).direction;
+  if (computed === 'rtl' || computed === 'ltr') return computed === 'rtl';
+  return el.closest('[dir]')?.getAttribute('dir')?.toLowerCase() === 'rtl';
 }

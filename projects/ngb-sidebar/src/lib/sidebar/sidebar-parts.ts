@@ -87,7 +87,8 @@ export class NgbSidebarGroupComponent {
   selector: 'ngb-sidebar-group-label',
   standalone: true,
   // Collapsible labels get a chevron automatically (hidden when the label projects its own).
-  template: '<ng-content></ng-content>@if (group?.collapsible()) {<i class="ngb-sidebar-chevron ngb-sidebar-group-chevron ngb-sidebar-group-chevron-auto" aria-hidden="true"></i>}',
+  template:
+    '<ng-content></ng-content>@if (group?.collapsible()) {<i class="ngb-sidebar-chevron ngb-sidebar-group-chevron ngb-sidebar-group-chevron-auto" aria-hidden="true"></i>}',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class:
@@ -204,6 +205,13 @@ abstract class MenuButtonBase {
 
   protected onClick(): void {
     if (this.item?.collapsible()) {
+      // A collapsed icon rail hides sub menus, so toggling there would do nothing visible:
+      // expand the sidebar and open the item, so its pages are one click away.
+      if (this.sidebar?.iconCollapsed()) {
+        this.sidebar.expand();
+        this.item.open.set(true);
+        return;
+      }
       this.item.toggle();
       return;
     }
