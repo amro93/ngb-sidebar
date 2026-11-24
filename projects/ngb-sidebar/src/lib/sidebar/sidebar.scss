@@ -211,7 +211,8 @@
     margin-inline-start: auto;
   }
   // a label that brings its own chevron keeps only that one
-  &:has(.ngb-sidebar-group-chevron:not(.ngb-sidebar-group-chevron-auto)) > .ngb-sidebar-group-chevron-auto {
+  &:has(.ngb-sidebar-group-chevron:not(.ngb-sidebar-group-chevron-auto))
+    > .ngb-sidebar-group-chevron-auto {
     display: none;
   }
   [data-open='false'] > & .ngb-sidebar-group-chevron::before {
